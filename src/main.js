@@ -52,8 +52,7 @@ const pedestrians = createPedestrians(scene, 14);
 const fireworks = createFireworks(scene);
 const input = createInputController({
   canvas,
-  joystick: $("#joystick"),
-  knob: $("#joystick-knob"),
+  directionButtons: document.querySelectorAll("[data-direction]"),
   cameraButton: $("#camera-button")
 });
 
@@ -97,7 +96,7 @@ function enterCity() {
   hasEnteredCity = true;
   intro.classList.add("is-hidden");
   hud.hidden = false;
-  helpTip.textContent = "WASD / arrows or joystick to walk · Drag to rotate camera";
+  helpTip.textContent = "Hold direction buttons or use WASD · Drag to rotate camera";
   showToast("Welcome to Diwali City");
 }
 startButton.addEventListener("click", enterCity);
