@@ -1,9 +1,9 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
 const COLORS = {
-  grass: 0x263c2c,
-  road: 0x30333d,
-  pavement: 0x777777,
+  grass: 0x3b6542,
+  road: 0x3b3d47,
+  pavement: 0x8b8278,
   gold: 0xffc56b,
   warm: 0xffa13b,
   dark: 0x30251f
@@ -105,14 +105,31 @@ function addHouse(scene, x, z, side, floors, palette, decorations, blockers) {
   body.receiveShadow = true;
   group.add(body);
 
-  const roof = box(width + 0.45, 0.32, 7.35, 0x59483c);
-  roof.position.y = height + 0.16;
+  const roof = box(width + 0.62, 0.38, 7.55, 0x73513d);
+  roof.position.y = height + 0.18;
   group.add(roof);
+  const roofCap = box(width + 0.78, 0.13, 7.7, 0xe8b86d);
+  roofCap.position.y = height + 0.39;
+  group.add(roofCap);
+  const facadeTrim = box(width + 0.12, 0.2, 0.18, 0xffd27e);
+  facadeTrim.position.set(0, height - 0.08, 3.58);
+  group.add(facadeTrim);
+  const baseTrim = box(width + 0.18, 0.24, 0.2, 0x9c6546);
+  baseTrim.position.set(0, 0.16, 3.58);
+  group.add(baseTrim);
+  for (const edgeX of [-width / 2 + 0.18, width / 2 - 0.18]) {
+    const column = box(0.28, height - 0.15, 0.25, 0xf0c58a);
+    column.position.set(edgeX, height / 2, 3.58);
+    group.add(column);
+    const capital = box(0.48, 0.2, 0.34, 0xffd98c);
+    capital.position.set(edgeX, height - 0.22, 3.62);
+    group.add(capital);
+  }
 
   const windowGlow = new THREE.MeshStandardMaterial({
     color: 0xffd28a,
     emissive: 0xffa13b,
-    emissiveIntensity: 1.1,
+    emissiveIntensity: 2.15,
     roughness: 0.5
   });
   const windowDark = new THREE.MeshStandardMaterial({
@@ -123,49 +140,87 @@ function addHouse(scene, x, z, side, floors, palette, decorations, blockers) {
   const columns = Math.max(2, Math.floor(width / 2.5));
   for (let floor = 0; floor < floors; floor += 1) {
     for (let column = 0; column < columns; column += 1) {
+      const windowX = -width / 2 + ((column + 0.5) * width) / columns;
+      const windowY = 1.55 + floor * 3.15;
+      const frame = box(1.04, 1.34, 0.16, 0x8b563b);
+      frame.position.set(windowX, windowY, 3.56);
+      group.add(frame);
       const pane = new THREE.Mesh(
         new THREE.BoxGeometry(0.82, 1.12, 0.13),
-        Math.random() > 0.22 ? windowGlow : windowDark
+        Math.random() > 0.16 ? windowGlow : windowDark
       );
-      pane.position.set(
-        -width / 2 + ((column + 0.5) * width) / columns,
-        1.55 + floor * 3.15,
-        3.57
-      );
+      pane.position.set(windowX, windowY, 3.67);
       group.add(pane);
+      const crossbar = box(0.86, 0.075, 0.08, 0xf1c98d);
+      crossbar.position.set(windowX, windowY, 3.76);
+      group.add(crossbar);
+      const mullion = box(0.075, 1.15, 0.08, 0xf1c98d);
+      mullion.position.set(windowX, windowY, 3.76);
+      group.add(mullion);
     }
   }
 
-  const door = box(1.45, 2.25, 0.16, 0x593a2a);
-  door.position.set(0, 1.12, 3.62);
+  const doorFrame = box(1.82, 2.55, 0.2, 0xf2c77f);
+  doorFrame.position.set(0, 1.28, 3.57);
+  group.add(doorFrame);
+  const door = box(1.45, 2.25, 0.16, 0x70402b);
+  door.position.set(0, 1.12, 3.7);
   group.add(door);
-
-  const lintel = box(1.8, 0.13, 0.2, 0xe5b85e);
-  lintel.position.set(0, 2.32, 3.68);
+  const doorPanel = box(1.12, 1.78, 0.055, 0x965737);
+  doorPanel.position.set(0, 1.12, 3.8);
+  group.add(doorPanel);
+  const handle = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 10),
+    new THREE.MeshStandardMaterial({ color: 0xffd36d, metalness: 0.72, roughness: 0.28 }));
+  handle.position.set(0.48, 1.08, 3.86);
+  group.add(handle);
+  const lintel = box(2.05, 0.16, 0.25, 0xffd477);
+  lintel.position.set(0, 2.58, 3.7);
   group.add(lintel);
 
   if (floors > 1) {
     const balcony = box(width * 0.72, 0.16, 1.05, 0xb7a99b);
     balcony.position.set(0, 3.22, 4.05);
     group.add(balcony);
-    const rail = box(width * 0.72, 0.72, 0.1, 0x695d55);
-    rail.position.set(0, 3.62, 4.52);
+    const rail = box(width * 0.72, 0.12, 0.12, 0xffd28a);
+    rail.position.set(0, 3.96, 4.52);
     group.add(rail);
+    for (let post = -3; post <= 3; post += 1) {
+      const baluster = box(0.075, 0.62, 0.075, 0xd9b77f);
+      baluster.position.set(post * 0.72, 3.68, 4.52);
+      group.add(baluster);
+    }
   }
 
-  const lightCount = Math.max(12, Math.floor(width * 2.5));
+  const lightCount = Math.max(24, Math.floor(width * 3.5));
   for (let i = 0; i < lightCount; i += 1) {
     const bulbColor = [0xff4b43, 0xffc34f, 0x55d9ff, 0x7bf0a0, 0xff79cb][i % 5];
     const bulb = new THREE.Mesh(
-      new THREE.SphereGeometry(0.085, 8, 8),
+      new THREE.SphereGeometry(0.105, 10, 10),
       new THREE.MeshBasicMaterial({ color: bulbColor })
     );
     const t = i / (lightCount - 1);
-    bulb.position.set(-width / 2 + t * width, height - 0.25, 3.72);
+    bulb.position.set(-width / 2 + t * width, height - 0.25, 3.82);
     group.add(bulb);
     decorations.bulbs.push(bulb);
   }
-
+  for (let side = -1; side <= 1; side += 2) {
+    for (let step = 0; step < 5; step += 1) {
+      const lantern = new THREE.Mesh(new THREE.SphereGeometry(0.095, 10, 8),
+        new THREE.MeshBasicMaterial({ color: step % 2 ? 0xffd36a : 0xff704b }));
+      lantern.position.set(side * (width / 2 - 0.65), 0.75 + step * 0.48, 3.88);
+      group.add(lantern);
+      decorations.bulbs.push(lantern);
+    }
+  }
+  const toran = box(2.2, 0.12, 0.12, 0x3c9b60);
+  toran.position.set(0, 2.78, 3.88);
+  group.add(toran);
+  for (let leaf = -4; leaf <= 4; leaf += 1) {
+    const flower = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8),
+      new THREE.MeshBasicMaterial({ color: leaf % 2 ? 0xffd36a : 0xff6d58 }));
+    flower.position.set(leaf * 0.23, 2.66, 3.95);
+    group.add(flower);
+  }
   group.position.set(x, 0, z);
   blockers.push({ x, z, halfX: 3.8, halfZ: width / 2 + 0.35 });
   group.rotation.y = side === "left" ? Math.PI / 2 : -Math.PI / 2;
@@ -186,13 +241,13 @@ function addStreetLamp(scene, x, z, decorations) {
   scene.add(arm);
 
   const bulb = new THREE.Mesh(
-    new THREE.SphereGeometry(0.22, 12, 12),
+    new THREE.SphereGeometry(0.28, 14, 14),
     new THREE.MeshBasicMaterial({ color: 0xffd58a })
   );
   bulb.position.set(x + (x < 0 ? 0.85 : -0.85), 5.12, z);
   scene.add(bulb);
 
-  const light = new THREE.PointLight(0xffbd70, 1.45, 15, 2);
+  const light = new THREE.PointLight(0xffc477, 2.1, 19, 1.8);
   light.position.copy(bulb.position);
   scene.add(light);
   decorations.lamps.push(light);
@@ -270,8 +325,8 @@ export function createCity(scene) {
   const decorations = { bulbs: [], flames: [], lamps: [] };
   const blockers = [];
 
-  scene.add(new THREE.HemisphereLight(0x9baedb, 0x282016, 1.35));
-  const moonLight = new THREE.DirectionalLight(0xc4d4ff, 1.25);
+  scene.add(new THREE.HemisphereLight(0xb7c9f4, 0x44301e, 1.65));
+  const moonLight = new THREE.DirectionalLight(0xd7ddff, 1.45);
   moonLight.position.set(-24, 38, -25);
   moonLight.castShadow = true;
   moonLight.shadow.mapSize.set(1024, 1024);
@@ -281,14 +336,14 @@ export function createCity(scene) {
   moonLight.shadow.camera.bottom = -70;
   scene.add(moonLight);
 
-  const warmFill = new THREE.PointLight(0xff9d48, 1.3, 65, 2);
+  const warmFill = new THREE.PointLight(0xffa34f, 1.8, 78, 1.8);
   warmFill.position.set(0, 8, 0);
   scene.add(warmFill);
 
   addGround(scene);
   addSky(scene);
 
-  const housePalette = [0xd99a75, 0xe7c28d, 0xc98b83, 0xd5d2b8, 0xaeb8a2, 0xc9a6d5];
+  const housePalette = [0xe9a078, 0xf0d09a, 0xe18e8b, 0xe1dfbd, 0xb9d0a5, 0xd7a9df, 0xe8b96f];
   for (let z = -70; z <= 70; z += 20) {
     addHouse(scene, -18, z, "left", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
     addHouse(scene, 18, z, "right", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
@@ -317,7 +372,7 @@ export function createCity(scene) {
     },
     update(time) {
       decorations.bulbs.forEach((bulb, index) => {
-        const pulse = 0.78 + Math.sin(time * 2.2 + index * 0.7) * 0.22;
+        const pulse = 0.88 + Math.sin(time * 2.8 + index * 0.7) * 0.16;
         bulb.scale.setScalar(pulse);
       });
       decorations.flames.forEach((flame, index) => {
