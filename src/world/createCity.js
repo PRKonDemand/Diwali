@@ -309,7 +309,7 @@ function addSky(scene) {
     starPositions.push(
       (Math.random() - 0.5) * 570,
       45 + Math.random() * 225,
-      (Math.random() - 0.5) * 190
+      (Math.random() - 0.5) * 570
     );
   }
   const geometry = new THREE.BufferGeometry();
