@@ -10,7 +10,10 @@
   --glass: rgba(13, 20, 39, .72);
   --line: rgba(255, 237, 205, .17);
 }
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body, button, a { -webkit-tap-highlight-color: transparent; }
+button { -webkit-appearance: none; appearance: none; user-select: none; -webkit-user-select: none; }
 html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { background: #080d1b; }
 button { font: inherit; }
@@ -36,16 +39,20 @@ h1 span { color: var(--gold); }
 .wordmark { color: white; text-decoration: none; font-size: 13px; font-weight: 900; letter-spacing: .13em; text-shadow: 0 2px 18px #000; }
 .wordmark span { color: var(--gold); }
 .topbar__right { display: flex; align-items: center; gap: 10px; }
-.location-pill, .icon-button, .help-tip, .action-button, .joystick { border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.location-pill, .icon-button, .help-tip, .action-button, .direction-button { border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
 .location-pill { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 99px; color: #ffebc9; font-size: 11px; }
 .location-pill i { width: 7px; height: 7px; border-radius: 50%; background: #7be0a1; box-shadow: 0 0 12px #7be0a1; }
 .icon-button { width: 42px; height: 42px; border-radius: 50%; color: white; pointer-events: auto; font-size: 16px; cursor: pointer; }
 .help-tip { position: absolute; top: 82px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 30px); padding: 9px 15px; border-radius: 99px; color: rgba(255,245,224,.8); font-size: 11px; white-space: nowrap; }
 .control-deck { position: absolute; left: max(18px, env(safe-area-inset-left)); right: max(18px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); display: flex; align-items: end; justify-content: space-between; }
 .move-control { display: grid; justify-items: center; gap: 7px; }
-.joystick { position: relative; width: 116px; height: 116px; border-radius: 50%; pointer-events: auto; touch-action: none; display: grid; place-items: center; }
-.joystick__ring { position: absolute; inset: 19px; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; }
-.joystick__knob { position: absolute; width: 48px; height: 48px; left: 50%; top: 50%; transform: translate(-50%,-50%); border-radius: 50%; border: 1px solid rgba(255,255,255,.75); background: linear-gradient(145deg, #fff6df, #d8c7a9); box-shadow: 0 5px 18px #0008; }
+.direction-pad { display: grid; grid-template-columns: repeat(3, 46px); grid-template-rows: repeat(3, 46px); gap: 5px; pointer-events: none; }
+.direction-button { width: 46px; height: 46px; display: grid; place-items: center; padding: 0; border-radius: 14px; color: #fff2d7; font-size: 17px; font-weight: 850; pointer-events: auto; touch-action: none; cursor: pointer; box-shadow: 0 5px 16px rgba(0,0,0,.24); transition: background .12s ease, transform .12s ease, border-color .12s ease; }
+.direction-button--up { grid-column: 2; grid-row: 1; }
+.direction-button--left { grid-column: 1; grid-row: 2; }
+.direction-button--down { grid-column: 2; grid-row: 2; }
+.direction-button--right { grid-column: 3; grid-row: 2; }
+.direction-button:active, .direction-button.is-pressed { background: rgba(255,174,74,.88); border-color: rgba(255,222,164,.85); color: #271707; transform: scale(.94); }
 .control-caption { color: rgba(255,255,255,.7); font-size: 9px; font-weight: 800; letter-spacing: .2em; }
 .action-controls { display: flex; align-items: end; gap: 11px; }
 .action-button { width: 67px; height: 67px; display: grid; align-content: center; justify-items: center; gap: 5px; border-radius: 22px; color: white; pointer-events: auto; cursor: pointer; }
@@ -65,15 +72,15 @@ h1 span { color: var(--gold); }
 @media (max-width: 600px) {
   .intro__copy { max-width: 310px; font-size: 13px; }
   .help-tip { top: 76px; font-size: 9px; }
-  .joystick { width: 104px; height: 104px; }
-  .joystick__knob { width: 43px; height: 43px; }
+  .direction-pad { grid-template-columns: repeat(3, 42px); grid-template-rows: repeat(3, 42px); gap: 4px; }
+  .direction-button { width: 42px; height: 42px; border-radius: 12px; }
   .action-button { width: 59px; height: 59px; border-radius: 19px; }
   .action-button--fire { width: 70px; height: 70px; }
   .action-controls { gap: 8px; }
 }
 @media (max-height: 500px) and (orientation: landscape) {
-  .joystick { width: 88px; height: 88px; }
-  .joystick__knob { width: 38px; height: 38px; }
+  .direction-pad { grid-template-columns: repeat(3, 36px); grid-template-rows: repeat(3, 36px); gap: 3px; }
+  .direction-button { width: 36px; height: 36px; border-radius: 10px; }
   .action-button { width: 54px; height: 54px; }
   .action-button--fire { width: 62px; height: 62px; }
   .help-tip { top: 67px; }
