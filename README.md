@@ -1,24 +1,40 @@
 # Diwali City Simulator
 
-A mobile-friendly, browser-based 3D neighbourhood simulator built with Three.js.
+A browser-based 3D Indian neighbourhood festival simulator built with Three.js. The project uses native JavaScript ES modules and a modular, feature-oriented structure.
 
-## Architecture
+## Project structure
 
-- `index.html` — semantic application shell and HUD markup.
-- `styles.css` — responsive presentation and mobile-safe controls.
-- `src/main.js` — application entry point, renderer lifecycle, resize handling and module orchestration.
-- `src/world/createCity.js` — procedural environment: roads, walkways, houses, lights, trees, diyas and night sky.
+- `index.html` — semantic app shell, intro screen and game HUD.
+- `styles.css` — responsive styling, safe-area spacing and touch controls.
+- `src/main.js` — app composition, Three.js renderer, lifecycle, game loop and system coordination.
+- `src/world/createCity.js` — roads, walkways, houses, lights, trees, diyas, sky and house collision boundaries.
+- `src/world/createPedestrians.js` — ambient walkers and child-sized pedestrians.
+- `src/player/createCharacter.js` — reusable character model and walk animation.
+- `src/controls/createInputController.js` — keyboard, touch joystick and camera drag/zoom input.
+- `src/effects/createFireworks.js` — visual-only particle bursts with geometry/material cleanup.
 
 ## Runtime
 
-The project uses native JavaScript ES modules and imports Three.js from jsDelivr. No bundler is required for the current static build. Run it through a local static web server or deploy the repository as a static site; opening `index.html` directly with `file://` may block module imports.
+Three.js is imported as an ES module from jsDelivr. No bundler is required for this static version. Run through a static web server or deploy as a static site; opening the page with `file://` may block module imports.
 
-## Development boundaries
+## Architecture rules
 
-Keep world generation inside `src/world/`, player logic inside `src/player/`, and input handling inside `src/controls/`. `src/main.js` should coordinate these systems rather than contain their implementation details. Keep persistent game state and UI state separate from Three.js scene objects.
+1. `main.js` coordinates systems; feature implementation belongs in its own module.
+2. World generation and world collision data stay in `src/world/`.
+3. Character creation and animation stay in `src/player/`.
+4. Input devices stay in `src/controls/`; they expose state instead of directly moving scene objects.
+5. Visual effects stay in `src/effects/` and must dispose temporary GPU resources.
+6. Keep game state in memory for this single-player simulator; do not add a backend or browser storage without a clear requirement.
 
-## Current progress
+## Progress
 
-- Part 1: application shell, responsive HUD and Three.js foundation.
-- Part 2: modular Diwali neighbourhood environment.
-- Part 3: player controller, camera follow, mobile joystick, keyboard input and visual-only in-game fireworks.
+- Part 1 — app shell, responsive HUD and Three.js foundation.
+- Part 2 — modular Diwali neighbourhood environment.
+- Part 3 — player character, keyboard/touch movement, camera follow, pedestrians, pause/resume and visual fireworks.
+
+## Controls
+
+- Desktop: WASD or arrow keys to move; drag the scene to orbit the camera.
+- Mobile: use the on-screen joystick; drag the scene to orbit the camera.
+- Camera button: cycle camera distance.
+- Fireworks button: trigger a decorative in-game particle burst.
