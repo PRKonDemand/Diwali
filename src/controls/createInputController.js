@@ -1,65 +1,77 @@
-export function createInputController({ canvas, joystick, knob, cameraButton }) {
+export function createInputController({ canvas, directionButtons, cameraButton }) {
   const keys = new Set();
-  const state = { x: 0, y: 0, cameraYaw: 0, cameraDistance: 8.5 };
-  let joystickPointer = null;
+  const pressedDirections = new Set();
+  const pointerDirections = new Map();
+  const state = { cameraYaw: 0, cameraDistance: 8.5 };
   let cameraPointer = null;
   let lastPointerX = 0;
-  const radius = 34;
   const cameraDistances = [8.5, 11.5, 15];
 
-  function setJoystick(clientX, clientY) {
-    const rect = joystick.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    let dx = clientX - centerX;
-    let dy = clientY - centerY;
-    const length = Math.hypot(dx, dy);
-    if (length > radius) {
-      dx = (dx / length) * radius;
-      dy = (dy / length) * radius;
-    }
-    state.x = dx / radius;
-    state.y = -dy / radius;
-    knob.style.left = "50%";
-    knob.style.top = "50%";
-    knob.style.transform = "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px))";
+  function setDirection(direction, pressed) {
+    if (pressed) pressedDirections.add(direction);
+    else pressedDirections.delete(direction);
+    directionButtons.forEach((button) => {
+      const active = button.dataset.direction === direction && pressed;
+      if (active) {
+        button.classList.add("is-pressed");
+        button.setAttribute("aria-pressed", "true");
+      } else if (button.dataset.direction === direction) {
+        button.classList.remove("is-pressed");
+        button.setAttribute("aria-pressed", "false");
+      }
+    });
   }
 
-  function resetJoystick() {
-    state.x = 0;
-    state.y = 0;
-    joystickPointer = null;
-    knob.style.left = "50%";
-    knob.style.top = "50%";
-    knob.style.transform = "translate(-50%, -50%)";
+  function releasePointer(pointerId) {
+    const direction = pointerDirections.get(pointerId);
+    if (!direction) return;
+    pointerDirections.delete(pointerId);
+    setDirection(direction, false);
   }
 
-  joystick.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    joystickPointer = event.pointerId;
-    joystick.setPointerCapture(event.pointerId);
-    setJoystick(event.clientX, event.clientY);
+  directionButtons.forEach((button) => {
+    const direction = button.dataset.direction;
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("contextmenu", (event) => event.preventDefault());
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      pointerDirections.set(event.pointerId, direction);
+      setDirection(direction, true);
+      button.setPointerCapture(event.pointerId);
+    });
+    button.addEventListener("pointerup", (event) => releasePointer(event.pointerId));
+    button.addEventListener("pointercancel", (event) => releasePointer(event.pointerId));
+    button.addEventListener("lostpointercapture", (event) => releasePointer(event.pointerId));
+    button.addEventListener("click", (event) => event.preventDefault());
   });
-  joystick.addEventListener("pointermove", (event) => {
-    if (event.pointerId === joystickPointer) setJoystick(event.clientX, event.clientY);
-  });
-  joystick.addEventListener("pointerup", (event) => {
-    if (event.pointerId === joystickPointer) resetJoystick();
-  });
-  joystick.addEventListener("pointercancel", resetJoystick);
-  joystick.addEventListener("lostpointercapture", resetJoystick);
 
+  const keyToDirection = {
+    w: "up", arrowup: "up",
+    s: "down", arrowdown: "down",
+    a: "left", arrowleft: "left",
+    d: "right", arrowright: "right"
+  };
   window.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
-    if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
-      event.preventDefault();
-      keys.add(key);
-    }
+    if (!keyToDirection[key]) return;
+    event.preventDefault();
+    keys.add(key);
   });
   window.addEventListener("keyup", (event) => keys.delete(event.key.toLowerCase()));
-  window.addEventListener("blur", () => {
+
+  function clearMovement() {
     keys.clear();
-    resetJoystick();
+    pointerDirections.forEach((direction) => setDirection(direction, false));
+    pointerDirections.clear();
+    pressedDirections.clear();
+    directionButtons.forEach((button) => {
+      button.classList.remove("is-pressed");
+      button.setAttribute("aria-pressed", "false");
+    });
+  }
+
+  window.addEventListener("blur", () => {
+    clearMovement();
     cameraPointer = null;
   });
 
@@ -89,12 +101,12 @@ export function createInputController({ canvas, joystick, knob, cameraButton }) 
 
   return {
     getMovement() {
-      let x = state.x;
-      let y = state.y;
-      if (keys.has("a") || keys.has("arrowleft")) x -= 1;
-      if (keys.has("d") || keys.has("arrowright")) x += 1;
-      if (keys.has("w") || keys.has("arrowup")) y += 1;
-      if (keys.has("s") || keys.has("arrowdown")) y -= 1;
+      let x = 0;
+      let y = 0;
+      if (keys.has("a") || keys.has("arrowleft") || pressedDirections.has("left")) x -= 1;
+      if (keys.has("d") || keys.has("arrowright") || pressedDirections.has("right")) x += 1;
+      if (keys.has("w") || keys.has("arrowup") || pressedDirections.has("up")) y += 1;
+      if (keys.has("s") || keys.has("arrowdown") || pressedDirections.has("down")) y -= 1;
       const length = Math.hypot(x, y);
       if (length > 1) { x /= length; y /= length; }
       return { x, y };
@@ -103,8 +115,7 @@ export function createInputController({ canvas, joystick, knob, cameraButton }) 
       return { yaw: state.cameraYaw, distance: state.cameraDistance };
     },
     reset() {
-      keys.clear();
-      resetJoystick();
+      clearMovement();
     }
   };
 }
