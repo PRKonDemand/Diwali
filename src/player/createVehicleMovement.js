@@ -24,7 +24,7 @@ export function createVehicleMovement({ THREE, player, car, city, input }) {
     if (Math.abs(speed) > 0.08) {
       const steeringStrength = 0.32 + Math.min(Math.abs(speed) / maxForwardSpeed, 1) * 1.05;
       const reverseFactor = speed >= 0 ? 1 : -1;
-      player.root.rotation.y -= steering * steeringStrength * dt * reverseFactor;
+      player.root.rotation.y += steering * steeringStrength * dt * reverseFactor;
     }
 
     const yaw = player.root.rotation.y;
