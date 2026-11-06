@@ -11,3 +11,61 @@
 .pause-panel{position:absolute;inset:0;display:grid;place-items:center;pointer-events:auto;background:rgba(3,7,17,.62);backdrop-filter:blur(8px)}.pause-card{width:min(88%,350px);padding:34px 25px;border:1px solid var(--line);border-radius:25px;background:#101a2d;text-align:center;box-shadow:0 25px 80px #0008}.pause-card h2{margin:0 0 25px;font-size:30px}.loading{position:absolute;z-index:8;left:50%;bottom:35%;transform:translate(-50%,50%);display:flex;align-items:center;gap:10px;color:#ffedcf;font-size:12px;text-shadow:0 2px 8px #000;pointer-events:none;transition:opacity .3s ease}.loading.is-hidden{opacity:0}.loading__lamp{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 15px var(--orange);animation:pulse 1s infinite alternate}.toast{position:absolute;z-index:9;left:50%;top:125px;transform:translate(-50%,-8px);padding:10px 16px;border:1px solid var(--line);border-radius:99px;background:var(--glass);color:#fff0d2;font-size:11px;opacity:0;transition:.25s ease;pointer-events:none}.toast.is-visible{opacity:1;transform:translate(-50%,0)}@keyframes pulse{to{opacity:.35;transform:scale(.7)}}
 @media(max-width:600px){.intro__copy{max-width:310px;font-size:13px}.help-tip{top:76px;font-size:9px}.joystick-base{width:120px;height:120px}.joystick-knob{width:52px;height:52px}.action-button{width:59px;height:59px;border-radius:19px}.action-button--fire{width:70px;height:70px}.action-controls{gap:8px}}
 @media(max-height:500px) and (orientation:landscape){.joystick-base{width:104px;height:104px}.joystick-knob{width:46px;height:46px}.help-tip{top:67px}.action-button{width:54px;height:54px}.action-button--fire{width:62px;height:62px}}
+
+/* Festival visual refresh: richer colours, brighter lamps and a warmer welcome screen. */
+:root{
+  --gold:#ffd477;
+  --orange:#ff9a4c;
+  --glass:rgba(16,24,43,.76);
+  --line:rgba(255,226,177,.24);
+}
+body,#game{background:#10152b}
+.intro{
+  background:
+    radial-gradient(ellipse at 50% 54%,rgba(255,130,51,.25),transparent 42%),
+    radial-gradient(ellipse at 18% 18%,rgba(94,112,220,.18),transparent 38%),
+    radial-gradient(ellipse at 82% 22%,rgba(231,73,132,.13),transparent 34%),
+    linear-gradient(155deg,rgba(9,15,36,.48),rgba(7,10,25,.9));
+}
+.intro__glow{
+  background:conic-gradient(from 40deg,#ffb84d,#ff6c59,#e86bb2,#ffb84d);
+  filter:blur(105px);
+  opacity:.2;
+}
+h1 span{
+  background:linear-gradient(110deg,#ffe29a 8%,#ffb34e 48%,#ff8c70 92%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 8px 48px rgba(255,159,75,.18);
+}
+.intro__copy{color:rgba(255,246,226,.82)}
+.primary-button{
+  background:linear-gradient(115deg,#ffe5a5 0%,#ffc15e 48%,#ff9854 100%);
+  box-shadow:0 10px 42px rgba(255,143,60,.3),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.location-pill,.icon-button,.help-tip,.action-button{
+  border-color:rgba(255,225,178,.28);
+  background:rgba(14,22,42,.72);
+  box-shadow:0 8px 28px rgba(0,0,0,.16);
+}
+.action-button--fire{
+  background:linear-gradient(145deg,rgba(255,190,83,.98),rgba(239,91,54,.98) 58%,rgba(185,57,77,.96));
+  box-shadow:0 8px 34px rgba(246,102,55,.38),inset 0 1px 0 rgba(255,255,255,.38);
+}
+.joystick-base{
+  border-color:rgba(255,225,178,.34);
+  background:radial-gradient(circle,rgba(55,65,91,.82),rgba(16,24,45,.76));
+  box-shadow:inset 0 4px 22px rgba(0,0,0,.25),0 10px 34px rgba(0,0,0,.28),0 0 25px rgba(255,173,83,.08);
+}
+.joystick-ring{border-color:rgba(255,221,168,.3)}
+.joystick-knob{
+  background:linear-gradient(145deg,#ffe6a8,#ffad58 72%,#f17b49);
+  box-shadow:0 5px 22px rgba(255,153,69,.28),inset 0 2px 6px rgba(255,255,255,.5);
+}
+.pause-card{border-color:rgba(255,225,178,.24);background:linear-gradient(145deg,#192440,#10182c)}
+.loading__lamp{background:#ffe08b;box-shadow:0 0 18px #ff9b4d,0 0 34px rgba(255,155,77,.6)}
+@media(prefers-reduced-motion:reduce){
+  .intro,.primary-button,.toast,.loading{transition:none}
+  .loading__lamp{animation:none}
+}
