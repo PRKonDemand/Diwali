@@ -87,7 +87,7 @@ function addGround(scene) {
   }
 }
 
-function addHouse(scene, x, z, side, floors, palette, decorations) {
+function addHouse(scene, x, z, side, floors, palette, decorations, blockers) {
   const group = new THREE.Group();
   const width = 8 + (floors % 2) * 1.2;
   const height = floors * 3.15;
@@ -167,6 +167,7 @@ function addHouse(scene, x, z, side, floors, palette, decorations) {
   }
 
   group.position.set(x, 0, z);
+  blockers.push({ x, z, halfX: 3.8, halfZ: width / 2 + 0.35 });
   group.rotation.y = side === "left" ? Math.PI / 2 : -Math.PI / 2;
   scene.add(group);
 }
@@ -267,6 +268,7 @@ function addSky(scene) {
 
 export function createCity(scene) {
   const decorations = { bulbs: [], flames: [], lamps: [] };
+  const blockers = [];
 
   scene.add(new THREE.HemisphereLight(0x9baedb, 0x282016, 1.35));
   const moonLight = new THREE.DirectionalLight(0xc4d4ff, 1.25);
@@ -288,7 +290,7 @@ export function createCity(scene) {
 
   const housePalette = [0xd99a75, 0xe7c28d, 0xc98b83, 0xd5d2b8, 0xaeb8a2, 0xc9a6d5];
   for (let z = -70; z <= 70; z += 20) {
-    addHouse(scene, -18, z, "left", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations);
+    addHouse(scene, -18, z, "left", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
     addHouse(scene, 18, z, "right", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations);
     addHouse(scene, -52, z, "left", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations);
     addHouse(scene, 52, z, "right", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations);
@@ -307,6 +309,12 @@ export function createCity(scene) {
   }
 
   return {
+    isBlocked(x, z, radius = 0.48) {
+      return blockers.some((item) =>
+        Math.abs(x - item.x) < item.halfX + radius &&
+        Math.abs(z - item.z) < item.halfZ + radius
+      );
+    },
     update(time) {
       decorations.bulbs.forEach((bulb, index) => {
         const pulse = 0.78 + Math.sin(time * 2.2 + index * 0.7) * 0.22;
