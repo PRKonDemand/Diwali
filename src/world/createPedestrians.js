@@ -58,6 +58,7 @@ export function createPedestrians(scene, count = 12) {
       });
       celebrators.forEach(({ person, phase, baseRotation }) => {
         person.updateWalk(elapsed + phase, false);
+        person.updateCelebrate(elapsed + phase);
         if (!paused) {
           person.root.position.y = Math.max(0, Math.sin(elapsed * 2.4 + phase) * 0.07);
           person.root.rotation.y = baseRotation + Math.sin(elapsed * 1.8 + phase) * 0.12;
