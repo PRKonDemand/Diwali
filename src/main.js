@@ -57,7 +57,7 @@ const input = createInputController({
   directionButtons: document.querySelectorAll("[data-direction]"),
   cameraButton: $("#camera-button")
 });
-const movement = createPlayerMovement({ THREE, player, city, input, speed: 3.4 });
+const movement = createPlayerMovement({ THREE, player, city, input, speed: 5 });
 const followCamera = createFollowCamera({ THREE, camera, player, input });
 
 const clock = new THREE.Clock();
