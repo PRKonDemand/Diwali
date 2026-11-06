@@ -1,4 +1,4 @@
-export function createPlayerMovement({ THREE, player, city, input, speed = 2.8 }) {
+export function createPlayerMovement({ THREE, player, city, input, speed = 5 }) {
   const position = player.root.position;
 
   function update(delta, elapsed = 0) {
