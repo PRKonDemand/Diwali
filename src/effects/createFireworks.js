@@ -8,7 +8,7 @@ const MAX_BURSTS = 12;
 
 export function createFireworks(scene) {
   const bursts = [];
-  let nextAutomaticLaunch = 0.8;
+  let nextAutomaticLaunch = 4.2 + Math.random() * 1.6;
 
   function removeBurst(index) {
     const burst = bursts[index];
@@ -68,9 +68,9 @@ export function createFireworks(scene) {
   function launchAutomaticShow() {
     const color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
     const position = new THREE.Vector3(
-      (Math.random() - 0.5) * 76,
-      20 + Math.random() * 22,
-      (Math.random() - 0.5) * 145
+      (Math.random() - 0.5) * 440,
+      60 + Math.random() * 60,
+      (Math.random() - 0.5) * 440
     );
     launch(position, { color, style: ["sphere", "ring", "willow"][Math.floor(Math.random() * 3)] });
 
@@ -89,7 +89,7 @@ export function createFireworks(scene) {
       nextAutomaticLaunch -= delta;
       if (nextAutomaticLaunch <= 0) {
         launchAutomaticShow();
-        nextAutomaticLaunch = 1.05 + Math.random() * 1.45;
+        nextAutomaticLaunch = 4.2 + Math.random() * 1.6;
       }
 
       for (let index = bursts.length - 1; index >= 0; index -= 1) {
