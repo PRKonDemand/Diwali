@@ -69,3 +69,20 @@ h1 span{
   .intro,.primary-button,.toast,.loading{transition:none}
   .loading__lamp{animation:none}
 }
+
+
+/* In-game movement settings */
+.settings-overlay{position:absolute;inset:0;z-index:7;display:grid;place-items:center;padding:20px;pointer-events:auto;background:rgba(4,8,19,.68);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.settings-overlay[hidden]{display:none}
+.settings-card{width:min(100%,390px);padding:25px;border:1px solid rgba(255,225,178,.28);border-radius:25px;background:linear-gradient(145deg,rgba(29,42,69,.98),rgba(13,21,39,.98));box-shadow:0 28px 90px rgba(0,0,0,.48)}
+.settings-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:27px}
+.settings-heading .eyebrow{margin-bottom:9px;font-size:9px}
+.settings-heading h2{margin:0;font-size:26px;letter-spacing:-.04em}
+.settings-close{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:rgba(255,255,255,.07);color:#fff;font-size:25px;line-height:1;cursor:pointer}
+.setting-row{margin:0 0 25px}
+.setting-label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px;color:#fff2d9;font-size:13px;font-weight:750}
+.setting-label output{color:var(--gold);font-variant-numeric:tabular-nums}
+.setting-row input[type=range]{width:100%;height:6px;margin:0;accent-color:#ffb957;cursor:pointer;touch-action:pan-y}
+.setting-hints{display:flex;justify-content:space-between;margin-top:8px;color:rgba(255,245,224,.48);font-size:10px}
+.settings-reset{width:100%;min-height:43px;border:1px solid rgba(255,225,178,.25);border-radius:13px;background:rgba(255,255,255,.06);color:#ffe6bd;font-size:12px;font-weight:750;cursor:pointer}
+.settings-reset:active,.settings-close:active{transform:scale(.98)}
