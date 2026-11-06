@@ -17,6 +17,14 @@ const startButton = $("#start-button");
 const helpTip = $("#help-tip");
 const locationLabel = $("#location-label");
 const pauseButton = $("#pause-button");
+const settingsButton = $("#settings-button");
+const settingsOverlay = $("#settings-overlay");
+const settingsClose = $("#settings-close");
+const settingsReset = $("#settings-reset");
+const speedSlider = $("#movement-speed");
+const speedValue = $("#movement-speed-value");
+const sensitivitySlider = $("#movement-sensitivity");
+const sensitivityValue = $("#movement-sensitivity-value");
 const pausePanel = $("#pause-panel");
 const resumeButton = $("#resume-button");
 const fireButton = $("#fire-button");
@@ -64,6 +72,7 @@ const followCamera = createFollowCamera({ THREE, camera, player, input });
 const clock = new THREE.Clock();
 let hasEnteredCity = false;
 let paused = false;
+let settingsOpen = false;
 let elapsed = 0;
 let lastFireAt = 0;
 let toastTimeout = 0;
@@ -87,6 +96,7 @@ function showToast(message) {
 
 function setPaused(nextState) {
   paused = nextState;
+  if (paused) closeSettings();
   pausePanel.hidden = !paused;
   pauseButton.textContent = paused ? "▶" : "Ⅱ";
   pauseButton.setAttribute("aria-label", paused ? "Resume game" : "Pause game");
@@ -102,8 +112,47 @@ function enterCity() {
   helpTip.textContent = "Move with the joystick or use WASD · Drag to rotate camera";
   showToast("Welcome to Diwali City");
 }
+function openSettings() {
+  if (!hasEnteredCity || paused || settingsOpen) return;
+  settingsOpen = true;
+  settingsOverlay.hidden = false;
+  input.reset();
+}
+
+function closeSettings() {
+  settingsOpen = false;
+  settingsOverlay.hidden = true;
+}
+
+function applyMovementSettings() {
+  const speed = Number(speedSlider.value);
+  const sensitivity = Number(sensitivitySlider.value);
+  movement.setSpeed(speed);
+  input.setSensitivity(sensitivity);
+  speedValue.value = speed.toFixed(1);
+  speedValue.textContent = speed.toFixed(1);
+  sensitivityValue.value = sensitivity.toFixed(1) + "×";
+  sensitivityValue.textContent = sensitivity.toFixed(1) + "×";
+}
+
 startButton.addEventListener("click", enterCity);
 pauseButton.addEventListener("click", () => setPaused(!paused));
+settingsButton.addEventListener("click", openSettings);
+settingsClose.addEventListener("click", closeSettings);
+settingsOverlay.addEventListener("click", (event) => {
+  if (event.target === settingsOverlay) closeSettings();
+});
+speedSlider.addEventListener("input", applyMovementSettings);
+sensitivitySlider.addEventListener("input", applyMovementSettings);
+settingsReset.addEventListener("click", () => {
+  speedSlider.value = "5";
+  sensitivitySlider.value = "1";
+  applyMovementSettings();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && settingsOpen) closeSettings();
+});
+applyMovementSettings();
 resumeButton.addEventListener("click", () => setPaused(false));
 
 fireButton.addEventListener("click", () => {
@@ -123,7 +172,7 @@ fireButton.addEventListener("click", () => {
 });
 
 function updateWorld(delta) {
-  if (paused || !hasEnteredCity) return;
+  if (paused || settingsOpen || !hasEnteredCity) return;
   city.update(elapsed);
   pedestrians.update(delta, elapsed, false);
   fireworks.update(delta);
@@ -134,7 +183,7 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 1 / 30);
   elapsed += delta;
   updateWorld(delta);
-  if (hasEnteredCity && !paused) {
+  if (hasEnteredCity && !paused && !settingsOpen) {
     movement.update(delta, elapsed);
     const z = player.root.position.z;
     locationLabel.textContent = Math.abs(z) < 18 ? "Main Street" : "Festival Lane";
