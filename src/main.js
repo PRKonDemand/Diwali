@@ -6,6 +6,7 @@ import { createPlayerMovement } from "./player/createPlayerMovement.js";
 import { createFollowCamera } from "./camera/createFollowCamera.js";
 import { createInputController } from "./controls/createInputController.js";
 import { createFireworks } from "./effects/createFireworks.js";
+import { createFestivalAudio } from "./effects/createFestivalAudio.js";
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $("#world");
@@ -59,7 +60,8 @@ const player = createCharacter(scene, {
   skinColor: 0xc98762
 });
 const pedestrians = createPedestrians(scene, 30);
-const fireworks = createFireworks(scene);
+const festivalAudio = createFestivalAudio();
+const fireworks = createFireworks(scene, () => festivalAudio.playBurst());
 const input = createInputController({
   canvas,
   joystickBase: $("#joystick-base"),
@@ -107,6 +109,7 @@ function setPaused(nextState) {
 function enterCity() {
   if (hasEnteredCity) return;
   hasEnteredCity = true;
+  festivalAudio.unlock();
   intro.classList.add("is-hidden");
   hud.hidden = false;
   helpTip.textContent = "Move with the joystick or use WASD · Drag to rotate camera";
