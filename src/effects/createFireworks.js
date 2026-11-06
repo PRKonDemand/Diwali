@@ -6,9 +6,10 @@ const PALETTE = [
 ];
 const MAX_BURSTS = 12;
 
-export function createFireworks(scene) {
+export function createFireworks(scene, onBurst = () => {}) {
   const bursts = [];
   let nextAutomaticLaunch = 4.2 + Math.random() * 1.6;
+  let nextRoadsideLaunch = 2.2 + Math.random() * 1.5;
 
   function removeBurst(index) {
     const burst = bursts[index];
@@ -37,9 +38,9 @@ export function createFireworks(scene) {
           ? Math.random() * 0.9 + 0.1
           : Math.random() * 2 - 1;
       const horizontal = Math.sqrt(Math.max(0, 1 - vertical * vertical));
-      const speed = style === "willow"
-        ? 2 + Math.random() * 3.2
-        : 3.1 + Math.random() * 4.8;
+      const speed = options.speedMin !== undefined
+        ? options.speedMin + Math.random() * ((options.speedMax ?? options.speedMin + 1) - options.speedMin)
+        : style === "willow" ? 2 + Math.random() * 3.2 : 3.1 + Math.random() * 4.8;
       velocities.push(new THREE.Vector3(
         Math.cos(angle) * horizontal * speed,
         vertical * speed,
@@ -60,7 +61,8 @@ export function createFireworks(scene) {
     });
     const points = new THREE.Points(geometry, material);
     scene.add(points);
-    bursts.push({ points, velocities, age: 0, lifetime: style === "willow" ? 2.25 : 1.9 });
+    bursts.push({ points, velocities, age: 0, lifetime: options.lifetime ?? (style === "willow" ? 2.25 : 1.9) });
+    onBurst();
 
     while (bursts.length > MAX_BURSTS) removeBurst(0);
   }
@@ -90,6 +92,21 @@ export function createFireworks(scene) {
       if (nextAutomaticLaunch <= 0) {
         launchAutomaticShow();
         nextAutomaticLaunch = 4.2 + Math.random() * 1.6;
+      }
+
+      nextRoadsideLaunch -= delta;
+      if (nextRoadsideLaunch <= 0) {
+        const side = Math.random() < 0.5 ? -1 : 1;
+        const position = new THREE.Vector3(side * (18.5 + Math.random() * 1.5), 0.75, (Math.random() - 0.5) * 440);
+        launch(position, {
+          count: 28 + Math.floor(Math.random() * 14),
+          color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+          style: "sphere",
+          speedMin: 1.2,
+          speedMax: 2.8,
+          lifetime: 1.15
+        });
+        nextRoadsideLaunch = 2.8 + Math.random() * 2.2;
       }
 
       for (let index = bursts.length - 1; index >= 0; index -= 1) {
