@@ -345,7 +345,7 @@ export function createCity(scene) {
 
   const housePalette = [0xe9a078, 0xf0d09a, 0xe18e8b, 0xe1dfbd, 0xb9d0a5, 0xd7a9df, 0xe8b96f];
   for (let z = -250; z <= 250; z += 20) {
-    if ([-120, 0, 120].some((crossing) => Math.abs(z - crossing) < 10)) continue;
+    if ([-120, 0, 120].some((crossing) => Math.abs(z - crossing) <= 10)) continue;
     addHouse(scene, -54, z, "left", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
     addHouse(scene, 54, z, "right", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
     addHouse(scene, -156, z, "left", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
