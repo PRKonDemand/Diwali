@@ -25,7 +25,7 @@ function box(width, height, depth, color, options = {}) {
 
 function addGround(scene) {
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(190, 190),
+    new THREE.PlaneGeometry(570, 570),
     new THREE.MeshStandardMaterial({ color: COLORS.grass, roughness: 1 })
   );
   ground.rotation.x = -Math.PI / 2;
@@ -49,10 +49,10 @@ function addGround(scene) {
     scene.add(road);
   };
 
-  addRoad(0, 0, 13, 180);
-  addRoad(-35, 0, 9, 180);
-  addRoad(35, 0, 9, 180);
-  [-40, 0, 40].forEach((z) => addRoad(0, z, 180, 9));
+  addRoad(0, 0, 39, 540);
+  addRoad(-105, 0, 27, 540);
+  addRoad(105, 0, 27, 540);
+  [-120, 0, 120].forEach((z) => addRoad(0, z, 540, 27));
 
   const pavementMaterial = new THREE.MeshStandardMaterial({
     color: COLORS.pavement,
@@ -69,16 +69,16 @@ function addGround(scene) {
     scene.add(path);
   };
 
-  [-8.1, 8.1, -30, -40, 30, 40].forEach((x) => {
-    for (let z = -82; z <= 82; z += 4) {
-      addWalkway(x, z, 1.25, 3.8);
+  [-24.3, 24.3, -90, -120, 90, 120].forEach((x) => {
+    for (let z = -246; z <= 246; z += 12) {
+      addWalkway(x, z, 3.75, 11.4);
     }
   });
 
   const dashMaterial = new THREE.MeshBasicMaterial({ color: 0xd8d3c8 });
-  for (let z = -82; z <= 82; z += 9) {
+  for (let z = -246; z <= 246; z += 27) {
     const dash = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.16, 3.8),
+      new THREE.PlaneGeometry(0.48, 11.4),
       dashMaterial
     );
     dash.rotation.x = -Math.PI / 2;
@@ -301,14 +301,14 @@ function addSky(scene) {
     new THREE.SphereGeometry(3.8, 24, 24),
     new THREE.MeshBasicMaterial({ color: 0xffe6b7 })
   );
-  moon.position.set(-42, 42, -75);
+  moon.position.set(-126, 126, -225);
   scene.add(moon);
 
   const starPositions = [];
   for (let i = 0; i < 520; i += 1) {
     starPositions.push(
-      (Math.random() - 0.5) * 190,
-      15 + Math.random() * 75,
+      (Math.random() - 0.5) * 570,
+      45 + Math.random() * 225,
       (Math.random() - 0.5) * 190
     );
   }
@@ -330,10 +330,10 @@ export function createCity(scene) {
   moonLight.position.set(-24, 38, -25);
   moonLight.castShadow = true;
   moonLight.shadow.mapSize.set(1024, 1024);
-  moonLight.shadow.camera.left = -55;
-  moonLight.shadow.camera.right = 55;
-  moonLight.shadow.camera.top = 70;
-  moonLight.shadow.camera.bottom = -70;
+  moonLight.shadow.camera.left = -165;
+  moonLight.shadow.camera.right = 165;
+  moonLight.shadow.camera.top = 210;
+  moonLight.shadow.camera.bottom = -210;
   scene.add(moonLight);
 
   const warmFill = new THREE.PointLight(0xffa34f, 1.8, 78, 1.8);
@@ -344,23 +344,24 @@ export function createCity(scene) {
   addSky(scene);
 
   const housePalette = [0xe9a078, 0xf0d09a, 0xe18e8b, 0xe1dfbd, 0xb9d0a5, 0xd7a9df, 0xe8b96f];
-  for (let z = -70; z <= 70; z += 20) {
-    addHouse(scene, -18, z, "left", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
-    addHouse(scene, 18, z, "right", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
-    addHouse(scene, -52, z, "left", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
-    addHouse(scene, 52, z, "right", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
+  for (let z = -250; z <= 250; z += 20) {
+    if ([-120, 0, 120].some((crossing) => Math.abs(z - crossing) < 10)) continue;
+    addHouse(scene, -54, z, "left", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
+    addHouse(scene, 54, z, "right", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
+    addHouse(scene, -156, z, "left", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
+    addHouse(scene, 156, z, "right", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
   }
 
-  for (let z = -70; z <= 70; z += 28) {
-    addStreetLamp(scene, -9.2, z, decorations);
-    addStreetLamp(scene, 9.2, z, decorations);
-    addTree(scene, -27, z + 7);
-    addTree(scene, 27, z + 7);
+  for (let z = -240; z <= 240; z += 56) {
+    addStreetLamp(scene, -27.6, z, decorations);
+    addStreetLamp(scene, 27.6, z, decorations);
+    addTree(scene, -81, z + 21);
+    addTree(scene, 81, z + 21);
   }
 
-  for (let z = -72; z <= 72; z += 8) {
-    addDiya(scene, -7.35, z, decorations);
-    addDiya(scene, 7.35, z, decorations);
+  for (let z = -240; z <= 240; z += 24) {
+    addDiya(scene, -22.05, z, decorations);
+    addDiya(scene, 22.05, z, decorations);
   }
 
   return {
