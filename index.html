@@ -1,75 +1,14 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#080d1b" />
-  <meta name="description" content="Explore a festive Indian neighbourhood in Diwali City Simulator." />
-  <title>Diwali City — Festival Night Simulator</title>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="./styles.css" />
-</head>
-<body>
-  <main id="game" aria-label="Diwali City Simulator">
-    <canvas id="world" aria-label="3D Diwali neighbourhood"></canvas>
-
-    <section class="intro" id="intro">
-      <div class="intro__glow"></div>
-      <div class="intro__content">
-        <p class="eyebrow">A FESTIVE NIGHT IN INDIA</p>
-        <h1>Diwali <span>City</span></h1>
-        <p class="intro__copy">Walk through glowing streets, discover lively neighbourhoods and celebrate the festival of lights.</p>
-        <button class="primary-button" id="start-button" type="button">Enter the city <span aria-hidden="true">↗</span></button>
-        <p class="intro__hint">Best experienced in landscape mode</p>
-      </div>
-      <div class="intro__footer"><span>3D NEIGHBOURHOOD SIMULATOR</span><span>BUILT BY PRK</span></div>
-    </section>
-
-    <section class="hud" id="hud" aria-label="Game controls" hidden>
-      <header class="topbar">
-        <a class="wordmark" href="#" aria-label="Diwali City home">DIWALI <span>CITY</span></a>
-        <div class="topbar__right">
-          <span class="location-pill"><i></i><span id="location-label">Main Street</span></span>
-          <button class="icon-button" id="pause-button" type="button" aria-label="Pause game">Ⅱ</button>
-        </div>
-      </header>
-
-      <div class="help-tip" id="help-tip">Explore the neighbourhood · Hold the direction buttons to walk</div>
-
-      <div class="control-deck">
-        <div class="move-control" aria-label="Movement controls">
-          <div class="direction-pad" id="direction-pad">
-            <button class="direction-button direction-button--up" type="button" data-direction="up" aria-label="Move forward">▲</button>
-            <button class="direction-button direction-button--left" type="button" data-direction="left" aria-label="Move left">◀</button>
-            <button class="direction-button direction-button--down" type="button" data-direction="down" aria-label="Move backward">▼</button>
-            <button class="direction-button direction-button--right" type="button" data-direction="right" aria-label="Move right">▶</button>
-          </div>
-          <span class="control-caption">MOVE</span>
-        </div>
-        <div class="action-controls">
-          <button class="action-button action-button--camera" id="camera-button" type="button">
-            <span aria-hidden="true">◉</span><small>CAMERA</small>
-          </button>
-          <button class="action-button action-button--fire" id="fire-button" type="button">
-            <span aria-hidden="true">✦</span><small>FIREWORKS</small>
-          </button>
-        </div>
-      </div>
-
-      <div class="pause-panel" id="pause-panel" hidden>
-        <div class="pause-card">
-          <p class="eyebrow">TAKE A BREATH</p>
-          <h2>Game paused</h2>
-          <button class="primary-button" id="resume-button" type="button">Resume exploring</button>
-        </div>
-      </div>
-    </section>
-
-    <div class="loading" id="loading" role="status" aria-live="polite">
-      <span class="loading__lamp"></span><span id="loading-label">Preparing the festival lights…</span>
-    </div>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  </main>
-  <script type="module" src="./src/main.js"></script>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#080d1b" /><meta name="description" content="Explore a festive Indian neighbourhood in Diwali City Simulator." />
+<title>Diwali City — Festival Night Simulator</title><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin /><link rel="stylesheet" href="./styles.css" />
+</head><body><main id="game" aria-label="Diwali City Simulator"><canvas id="world" aria-label="3D Diwali neighbourhood"></canvas>
+<section class="intro" id="intro"><div class="intro__glow"></div><div class="intro__content"><p class="eyebrow">A FESTIVE NIGHT IN INDIA</p><h1>Diwali <span>City</span></h1><p class="intro__copy">Walk through glowing streets, discover lively neighbourhoods and celebrate the festival of lights.</p><button class="primary-button" id="start-button" type="button">Enter the city <span aria-hidden="true">↗</span></button><p class="intro__hint">Best experienced in landscape mode</p></div><div class="intro__footer"><span>3D NEIGHBOURHOOD SIMULATOR</span><span>BUILT BY PRK</span></div></section>
+<section class="hud" id="hud" aria-label="Game controls" hidden><header class="topbar"><a class="wordmark" href="#" aria-label="Diwali City home">DIWALI <span>CITY</span></a><div class="topbar__right"><span class="location-pill"><i></i><span id="location-label">Main Street</span></span><button class="icon-button" id="pause-button" type="button" aria-label="Pause game">Ⅱ</button></div></header>
+<div class="help-tip" id="help-tip">Move with the joystick · Drag the screen to rotate camera</div>
+<div class="control-deck"><div class="move-control" aria-label="Movement joystick"><div class="joystick-base" id="joystick-base" role="group" aria-label="Move character with joystick"><div class="joystick-ring" aria-hidden="true"></div><div class="joystick-knob" id="joystick-knob" aria-hidden="true"></div></div><span class="control-caption">MOVE</span></div>
+<div class="action-controls"><button class="action-button action-button--camera" id="camera-button" type="button"><span aria-hidden="true">◉</span><small>CAMERA</small></button><button class="action-button action-button--fire" id="fire-button" type="button"><span aria-hidden="true">✦</span><small>FIREWORKS</small></button></div></div>
+<div class="pause-panel" id="pause-panel" hidden><div class="pause-card"><p class="eyebrow">TAKE A BREATH</p><h2>Game paused</h2><button class="primary-button" id="resume-button" type="button">Resume exploring</button></div></div></section>
+<div class="loading" id="loading" role="status" aria-live="polite"><span class="loading__lamp"></span><span id="loading-label">Preparing the festival lights…</span></div><div class="toast" id="toast" role="status" aria-live="polite"></div>
+</main><script type="module" src="./src/main.js"></script></body></html>
