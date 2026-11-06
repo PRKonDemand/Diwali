@@ -54,7 +54,8 @@ const pedestrians = createPedestrians(scene, 14);
 const fireworks = createFireworks(scene);
 const input = createInputController({
   canvas,
-  directionButtons: document.querySelectorAll("[data-direction]"),
+  joystickBase: $("#joystick-base"),
+  joystickKnob: $("#joystick-knob"),
   cameraButton: $("#camera-button")
 });
 const movement = createPlayerMovement({ THREE, player, city, input, speed: 5 });
@@ -98,7 +99,7 @@ function enterCity() {
   hasEnteredCity = true;
   intro.classList.add("is-hidden");
   hud.hidden = false;
-  helpTip.textContent = "Hold direction buttons or use WASD · Drag to rotate camera";
+  helpTip.textContent = "Move with the joystick or use WASD · Drag to rotate camera";
   showToast("Welcome to Diwali City");
 }
 startButton.addEventListener("click", enterCity);
@@ -132,7 +133,6 @@ function animate() {
   requestAnimationFrame(animate);
   const delta = Math.min(clock.getDelta(), 1 / 30);
   elapsed += delta;
-
   updateWorld(delta);
   if (hasEnteredCity && !paused) {
     movement.update(delta, elapsed);
@@ -140,7 +140,6 @@ function animate() {
     locationLabel.textContent = Math.abs(z) < 18 ? "Main Street" : "Festival Lane";
   }
   if (hasEnteredCity) followCamera.update(delta);
-
   renderer.render(scene, camera);
 }
 animate();
@@ -151,5 +150,4 @@ document.addEventListener("visibilitychange", () => {
 
 loadingLabel.textContent = "Your Diwali neighbourhood is ready";
 window.setTimeout(() => loading.classList.add("is-hidden"), 1100);
-
 console.info("Diwali City: gameplay modules loaded");
