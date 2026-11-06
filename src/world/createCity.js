@@ -49,10 +49,10 @@ function addGround(scene) {
     scene.add(road);
   };
 
-  addRoad(0, 0, 39, 540);
-  addRoad(-105, 0, 27, 540);
-  addRoad(105, 0, 27, 540);
-  [-120, 0, 120].forEach((z) => addRoad(0, z, 540, 27));
+  addRoad(0, 0, 13, 540);
+  addRoad(-105, 0, 9, 540);
+  addRoad(105, 0, 9, 540);
+  [-120, 0, 120].forEach((z) => addRoad(0, z, 540, 9));
 
   const pavementMaterial = new THREE.MeshStandardMaterial({
     color: COLORS.pavement,
