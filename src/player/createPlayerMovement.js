@@ -1,13 +1,12 @@
 export function createPlayerMovement({ THREE, player, city, input, speed = 2.8 }) {
   const position = player.root.position;
-  const maxFrameDelta = 1 / 30;
 
-  function update(delta) {
-    const frameDelta = Math.min(Math.max(delta, 0), maxFrameDelta);
+  function update(delta, elapsed = 0) {
+    const frameDelta = Math.min(Math.max(delta, 0), 1 / 30);
     const intent = input.getMovement();
     const inputLength = Math.hypot(intent.x, intent.y);
     if (inputLength < 0.001 || frameDelta === 0) {
-      player.updateWalk(performance.now() / 1000, false);
+      player.updateWalk(elapsed, false);
       return false;
     }
 
@@ -21,7 +20,10 @@ export function createPlayerMovement({ THREE, player, city, input, speed = 2.8 }
     const moveX = rightX * intent.x + forwardX * intent.y;
     const moveZ = rightZ * intent.x + forwardZ * intent.y;
     const magnitude = Math.hypot(moveX, moveZ);
-    if (magnitude < 0.001) return false;
+    if (magnitude < 0.001) {
+      player.updateWalk(elapsed, false);
+      return false;
+    }
 
     const directionX = moveX / magnitude;
     const directionZ = moveZ / magnitude;
@@ -34,7 +36,7 @@ export function createPlayerMovement({ THREE, player, city, input, speed = 2.8 }
     if (!city.isBlocked(position.x, nextZ)) position.z = nextZ;
 
     player.root.rotation.y = Math.atan2(directionX, directionZ);
-    player.updateWalk(performance.now() / 1000, true);
+    player.updateWalk(elapsed, true);
     return true;
   }
 
