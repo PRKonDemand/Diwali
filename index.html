@@ -34,13 +34,15 @@
         </div>
       </header>
 
-      <div class="help-tip" id="help-tip">Explore the neighbourhood · Use the joystick to walk</div>
+      <div class="help-tip" id="help-tip">Explore the neighbourhood · Hold the direction buttons to walk</div>
 
       <div class="control-deck">
-        <div class="move-control">
-          <div class="joystick" id="joystick" aria-label="Movement joystick">
-            <div class="joystick__ring"></div>
-            <div class="joystick__knob" id="joystick-knob"></div>
+        <div class="move-control" aria-label="Movement controls">
+          <div class="direction-pad" id="direction-pad">
+            <button class="direction-button direction-button--up" type="button" data-direction="up" aria-label="Move forward">▲</button>
+            <button class="direction-button direction-button--left" type="button" data-direction="left" aria-label="Move left">◀</button>
+            <button class="direction-button direction-button--down" type="button" data-direction="down" aria-label="Move backward">▼</button>
+            <button class="direction-button direction-button--right" type="button" data-direction="right" aria-label="Move right">▶</button>
           </div>
           <span class="control-caption">MOVE</span>
         </div>
