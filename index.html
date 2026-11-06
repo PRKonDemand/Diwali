@@ -1,420 +1,836 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🪔 Diwali City – Lights & Homes</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diwali City Simulator</title>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+
+/* =========================
+   GLOBAL DESIGN
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    overflow: hidden;
+    background: #050817;
+    font-family: Arial, sans-serif;
+    user-select: none;
+    touch-action: none;
+}
+
+#game-container {
+    width: 100vw;
+    height: 100dvh;
+    position: relative;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================
+   GAME HUD
+========================= */
+
+#game-ui {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#top-bar {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.game-logo {
+    color: white;
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 10px #ff8c00;
+}
+
+#location {
+    color: #ffe5a0;
+    font-size: 12px;
+    background: #111827bb;
+    border: 1px solid #ffffff25;
+    padding: 9px 14px;
+    border-radius: 20px;
+}
+
+/* =========================
+   CONTROL PANEL
+========================= */
+
+#controls {
+    position: absolute;
+    bottom: 25px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 20px;
+}
+
+#movement-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.game-btn {
+    pointer-events: auto;
+    border: 1px solid #ffffff40;
+    background: #18243bcc;
+    color: white;
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 5px 20px #0008;
+}
+
+.game-btn:active {
+    transform: scale(0.91);
+    background: #ff8c00;
+}
+
+#fire-btn {
+    width: 75px;
+    height: 75px;
+    background: linear-gradient(145deg,#ff9d00,#e83914);
+    border: 2px solid #ffcf72;
+    font-size: 12px;
+}
+
+#camera-btn {
+    background: #25334ccc;
+}
+
+/* =========================
+   JOYSTICK
+========================= */
+
+#joystick {
+    pointer-events: auto;
+    width: 115px;
+    height: 115px;
+    border-radius: 50%;
+    background: #ffffff20;
+    border: 2px solid #ffffff50;
+    position: relative;
+    touch-action: none;
+    backdrop-filter: blur(5px);
+}
+
+#joystick-knob {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #ffffffcc;
+    border: 3px solid white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    box-shadow: 0 3px 15px #0008;
+}
+
+/* =========================
+   GAME MESSAGE
+========================= */
+
+#message {
+    position: absolute;
+    top: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111827cc;
+    color: #ffe5a0;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media(max-width:600px) {
+
+    .game-logo {
+        font-size: 15px;
     }
 
-    body {
-      background: #0a0f1e;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+    #location {
+        font-size: 10px;
     }
 
-    .canvas-container {
-      background: #0b0e1a;
-      border-radius: 2rem;
-      padding: 1rem;
-      box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.8);
+    #controls {
+        padding: 0 12px;
+        bottom: 20px;
     }
 
-    canvas {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: 1.5rem;
-      box-shadow: inset 0 0 30px #00000055, 0 0 30px #ffb34733;
-      cursor: pointer;
-      transition: filter 0.3s ease;
+    #joystick {
+        width: 105px;
+        height: 105px;
     }
 
-    canvas:active {
-      filter: brightness(1.2);
+    #joystick-knob {
+        width: 45px;
+        height: 45px;
     }
 
-    .caption {
-      text-align: center;
-      margin-top: 0.8rem;
-      color: #ffd966;
-      letter-spacing: 2px;
-      font-weight: 400;
-      text-shadow: 0 0 8px #ff9f4b;
-      font-size: 1.1rem;
+    .game-btn {
+        width: 55px;
+        height: 55px;
     }
-  </style>
+
+    #fire-btn {
+        width: 68px;
+        height: 68px;
+    }
+}
+
+</style>
 </head>
-<body>
-  <div class="canvas-container">
-    <canvas id="diwaliCanvas" width="1000" height="600"></canvas>
-    <div class="caption">🪔  HAPPY DIWALI  🪔</div>
-  </div>
 
-  <script>
-    (function() {
-      const canvas = document.getElementById('diwaliCanvas');
-      const ctx = canvas.getContext('2d');
+<!-- PART 1 ENDS HERE -->
 
-      // ---------- dimensions ----------
-      const W = canvas.width;
-      const H = canvas.height;
-      const GROUND_Y = H * 0.78;        // where homes & diyas sit
-      const SKY_TOP = 0;
+<script>
 
-      // ---------- draw static night sky with stars ----------
-      function drawSky() {
-        // deep night gradient
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-        skyGrad.addColorStop(0, '#0a1128');
-        skyGrad.addColorStop(0.6, '#121b33');
-        skyGrad.addColorStop(1, '#1a1f2e');
-        ctx.fillStyle = skyGrad;
-        ctx.fillRect(0, 0, W, GROUND_Y + 10);
+// ==========================================
+// PART 2: DIWALI CITY 3D ENVIRONMENT
+// ==========================================
 
-        // stars (static, small)
-        ctx.fillStyle = '#fef9e7';
-        for (let i = 0; i < 180; i++) {
-          const x = (i * 37 + 13) % W;
-          const y = (i * 19 + 7) % (GROUND_Y - 30);
-          const radius = (i % 3 === 0) ? 1.8 : 1.2;
-          const alpha = 0.6 + (i % 5) * 0.08;
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.fillStyle = '#fff9e6';
-          ctx.fill();
+// SCENE
+const scene = new THREE.Scene();
+
+scene.background = new THREE.Color(0x080d22);
+scene.fog = new THREE.FogExp2(0x080d22, 0.006);
+
+// CAMERA
+const camera = new THREE.PerspectiveCamera(
+    65,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+
+camera.position.set(0, 5, 12);
+
+// RENDERER
+const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    powerPreference: "high-performance"
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 1.5)
+);
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+
+document.getElementById("game-container")
+    .appendChild(renderer.domElement);
+
+// ==========================================
+// LIGHTING
+// ==========================================
+
+const ambientLight = new THREE.AmbientLight(
+    0x8090c0,
+    0.65
+);
+
+scene.add(ambientLight);
+
+const moonLight = new THREE.DirectionalLight(
+    0xb4caff,
+    1.1
+);
+
+moonLight.position.set(-20, 35, -20);
+moonLight.castShadow = true;
+scene.add(moonLight);
+
+const warmLight = new THREE.PointLight(
+    0xff9d42,
+    2,
+    60
+);
+
+warmLight.position.set(0, 8, 0);
+scene.add(warmLight);
+
+// ==========================================
+// MATERIALS
+// ==========================================
+
+function material(color, roughness = 0.85) {
+    return new THREE.MeshStandardMaterial({
+        color: color,
+        roughness: roughness
+    });
+}
+
+const roadMaterial = material(0x252a35);
+const footpathMaterial = material(0x777780);
+const grassMaterial = material(0x243d2a);
+
+const wallColors = [
+    0xd99a75,
+    0xe7c28d,
+    0xc98b83,
+    0xd5d2b8,
+    0xaeb8a2,
+    0xc9a6d5
+];
+
+const lightColors = [
+    0xff3232,
+    0xffbb33,
+    0x33ccff,
+    0x55ff99,
+    0xff55cc,
+    0xffffff
+];
+
+// ==========================================
+// BASIC OBJECT CREATOR
+// ==========================================
+
+function createBox(
+    x, y, z,
+    width, height, depth,
+    mat,
+    parent = scene
+) {
+
+    const geometry = new THREE.BoxGeometry(
+        width, height, depth
+    );
+
+    const mesh = new THREE.Mesh(
+        geometry,
+        mat
+    );
+
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    parent.add(mesh);
+
+    return mesh;
+}
+
+// ==========================================
+// GROUND
+// ==========================================
+
+createBox(
+    0, -0.35, 0,
+    180, 0.5, 180,
+    grassMaterial
+);
+
+// ==========================================
+// ROAD NETWORK
+// ==========================================
+
+function createRoad(x, z, width, length, rotation = 0) {
+
+    const road = createBox(
+        x, -0.075, z,
+        width, 0.12, length,
+        roadMaterial
+    );
+
+    road.rotation.y = rotation;
+
+    return road;
+}
+
+// Main road
+createRoad(0, 0, 13, 170);
+
+// Side roads
+createRoad(-35, 0, 9, 170);
+createRoad(35, 0, 9, 170);
+
+// Cross streets
+createRoad(0, -40, 170, 9);
+createRoad(0, 40, 170, 9);
+createRoad(0, 0, 100, 9);
+
+// ==========================================
+// ROAD MARKINGS
+// ==========================================
+
+const whiteRoad = material(0xd8d8d8);
+
+for (let z = -75; z < 80; z += 9) {
+
+    createBox(
+        0, 0.002, z,
+        0.18, 0.025, 4,
+        whiteRoad
+    );
+
+}
+
+// ==========================================
+// FOOTPATHS
+// ==========================================
+
+function createSidewalk(x, z, width, length) {
+
+    createBox(
+        x, 0.05, z,
+        width, 0.35, length,
+        footpathMaterial
+    );
+
+}
+
+for (let z = -75; z <= 75; z += 1) {
+
+    createSidewalk(-9, z, 2, 1);
+    createSidewalk(9, z, 2, 1);
+
+    createSidewalk(-40, z, 2, 1);
+    createSidewalk(-30, z, 2, 1);
+
+    createSidewalk(30, z, 2, 1);
+    createSidewalk(40, z, 2, 1);
+
+}
+
+// ==========================================
+// BUILDING WINDOWS
+// ==========================================
+
+const windowMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffd27a,
+    emissive: 0xff9d32,
+    emissiveIntensity: 1.4
+});
+
+const darkWindow = material(0x26364b);
+
+function createWindows(
+    parent,
+    width,
+    height,
+    floors
+) {
+
+    const columns = Math.max(
+        2,
+        Math.floor(width / 2.5)
+    );
+
+    for (let floor = 0; floor < floors; floor++) {
+
+        for (let col = 0; col < columns; col++) {
+
+            const wx =
+                -width / 2 +
+                (col + 0.5) * width / columns;
+
+            const wy = 1.5 + floor * 3;
+
+            const windowMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(0.85, 1.25, 0.12),
+                Math.random() > 0.25
+                    ? windowMaterial
+                    : darkWindow
+            );
+
+            windowMesh.position.set(
+                wx,
+                wy,
+                0.56
+            );
+
+            parent.add(windowMesh);
+
         }
-        ctx.globalAlpha = 1.0;
-      }
 
-      // ---------- draw homes & buildings with glowing windows (static) ----------
-      function drawHomes() {
-        // ----- ground strip (dark) -----
-        ctx.fillStyle = '#0e121c';
-        ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+    }
 
-        // ----- row of homes / buildings -----
-        // each building: [x, width, height, windowColor, hasDiyasOnRoof]
-        const buildings = [
-          // left cluster
-          { x: 20, w: 90, h: 120, winColor: '#ffbb33', roofDiyas: true },
-          { x: 125, w: 70, h: 90, winColor: '#ffaa22', roofDiyas: false },
-          { x: 210, w: 110, h: 150, winColor: '#ffc857', roofDiyas: true },
-          { x: 335, w: 80, h: 100, winColor: '#ffb347', roofDiyas: false },
-          // middle: bigger house
-          { x: 440, w: 130, h: 170, winColor: '#ffb347', roofDiyas: true },
-          { x: 585, w: 70, h: 110, winColor: '#ffaa33', roofDiyas: false },
-          // right cluster
-          { x: 670, w: 95, h: 130, winColor: '#ffc04d', roofDiyas: true },
-          { x: 780, w: 80, h: 95, winColor: '#ffb300', roofDiyas: false },
-          { x: 875, w: 105, h: 140, winColor: '#ffd966', roofDiyas: true }
+}
+
+// ==========================================
+// DIWALI LIGHT STRINGS
+// ==========================================
+
+function createLightString(parent, width, y) {
+
+    const count = Math.floor(width * 3);
+
+    for (let i = 0; i < count; i++) {
+
+        const x = -width / 2 + (i / count) * width;
+
+        const color = lightColors[
+            Math.floor(Math.random() * lightColors.length)
         ];
 
-        // draw each building
-        buildings.forEach(b => {
-          const baseY = GROUND_Y;
-          const topY = baseY - b.h;
-
-          // main building body (warm dark tone)
-          ctx.fillStyle = '#272b36';
-          ctx.shadowColor = '#00000055';
-          ctx.shadowBlur = 12;
-          ctx.shadowOffsetY = 3;
-          ctx.beginPath();
-          ctx.roundRect(b.x, topY, b.w, b.h, 8);
-          ctx.fill();
-
-          // subtle outline
-          ctx.shadowBlur = 0;
-          ctx.shadowOffsetY = 0;
-          ctx.strokeStyle = '#5e4b2b';
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-
-          // windows (glowing)
-          const cols = Math.max(2, Math.floor(b.w / 28));
-          const rows = Math.max(2, Math.floor(b.h / 35));
-          const winW = 16;
-          const winH = 22;
-          const gapX = (b.w - cols * winW) / (cols + 1);
-          const gapY = (b.h - rows * winH) / (rows + 1);
-
-          ctx.shadowBlur = 14;
-          ctx.shadowColor = '#ffbb33';
-
-          for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-              const winX = b.x + gapX + c * (winW + gapX);
-              const winY = topY + gapY + r * (winH + gapY);
-              // some windows are lit, some dim (random pattern)
-              const isLit = ((r * 7 + c * 5 + b.x) % 7) < 5;  // 5/7 lit
-              if (isLit) {
-                ctx.fillStyle = b.winColor;
-                ctx.globalAlpha = 0.95;
-              } else {
-                ctx.fillStyle = '#3a3f4b';
-                ctx.globalAlpha = 0.5;
-              }
-              ctx.beginPath();
-              ctx.roundRect(winX, winY, winW, winH, 4);
-              ctx.fill();
-            }
-          }
-
-          // reset shadow/alpha
-          ctx.shadowBlur = 0;
-          ctx.globalAlpha = 1.0;
-
-          // if building has rooftop diyas (small flames)
-          if (b.roofDiyas) {
-            const diyaY = topY - 8;
-            const diyaCount = Math.floor(b.w / 30);
-            for (let d = 0; d < diyaCount; d++) {
-              const diyaX = b.x + 15 + d * 28;
-              // clay diya (small pot)
-              ctx.fillStyle = '#b45f2b';
-              ctx.shadowBlur = 12;
-              ctx.shadowColor = '#ff8c42';
-              ctx.beginPath();
-              ctx.ellipse(diyaX, diyaY + 4, 7, 3, 0, 0, Math.PI * 2);
-              ctx.fill();
-              // flame
-              ctx.fillStyle = '#ffb347';
-              ctx.shadowColor = '#ffaa33';
-              ctx.shadowBlur = 18;
-              ctx.beginPath();
-              ctx.moveTo(diyaX - 3, diyaY);
-              ctx.quadraticCurveTo(diyaX, diyaY - 12, diyaX + 3, diyaY);
-              ctx.fill();
-              // inner flame
-              ctx.fillStyle = '#fff7b0';
-              ctx.shadowBlur = 12;
-              ctx.beginPath();
-              ctx.moveTo(diyaX - 1.5, diyaY - 1);
-              ctx.quadraticCurveTo(diyaX, diyaY - 8, diyaX + 1.5, diyaY - 1);
-              ctx.fill();
-            }
-          }
+        const bulbMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 2
         });
 
-        // extra ground-level diyas (candles) at doorsteps / street
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = '#ffaa33';
+        const bulb = new THREE.Mesh(
+            new THREE.SphereGeometry(0.10, 8, 8),
+            bulbMaterial
+        );
 
-        // ground diya positions
-        const groundDiyas = [
-          55, 150, 245, 310, 395, 480, 540, 610, 690, 740, 830, 920, 960
-        ];
-        groundDiyas.forEach((x, idx) => {
-          const baseY = GROUND_Y + 6;
-          // tiny clay bowl
-          ctx.fillStyle = '#b45f2b';
-          ctx.shadowBlur = 14;
-          ctx.shadowColor = '#ff8c42';
-          ctx.beginPath();
-          ctx.ellipse(x, baseY - 2, 8, 4, 0, 0, Math.PI * 2);
-          ctx.fill();
-          // flame
-          ctx.fillStyle = '#ffb347';
-          ctx.shadowBlur = 22;
-          ctx.shadowColor = '#ffaa33';
-          ctx.beginPath();
-          ctx.moveTo(x - 4, baseY - 6);
-          ctx.quadraticCurveTo(x, baseY - 18, x + 4, baseY - 6);
-          ctx.fill();
-          ctx.fillStyle = '#fff7b0';
-          ctx.shadowBlur = 16;
-          ctx.beginPath();
-          ctx.moveTo(x - 2, baseY - 8);
-          ctx.quadraticCurveTo(x, baseY - 16, x + 2, baseY - 8);
-          ctx.fill();
+        bulb.position.set(x, y, 0.7);
 
-          // tiny reflection on ground
-          ctx.shadowBlur = 0;
-          ctx.globalAlpha = 0.2;
-          ctx.fillStyle = '#ffbb33';
-          ctx.beginPath();
-          ctx.ellipse(x, baseY + 4, 14, 4, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1.0;
-        });
+        parent.add(bulb);
 
-        // reset shadow
-        ctx.shadowBlur = 0;
-        ctx.shadowColor = 'transparent';
-      }
+    }
 
-      // ---------- floating candle / diya lights (animated) ----------
-      // store floating diya state
-      const floatingDiyas = [];
-      const FLOATING_COUNT = 14;
+}
 
-      function initFloatingDiyas() {
-        for (let i = 0; i < FLOATING_COUNT; i++) {
-          floatingDiyas.push({
-            x: Math.random() * W,
-            y: 60 + Math.random() * (GROUND_Y - 180), // stay above buildings mostly
-            radius: 4 + Math.random() * 6,
-            speedY: 0.2 + Math.random() * 0.4,
-            speedX: (Math.random() - 0.5) * 0.25,
-            phase: Math.random() * Math.PI * 2,
-            glowIntensity: 0.7 + Math.random() * 0.5,
-          });
+// ==========================================
+// CREATE INDIAN HOUSES
+// ==========================================
+
+function createHouse(x, z, floors = 2) {
+
+    const house = new THREE.Group();
+
+    const width = 8 + Math.random() * 4;
+    const height = floors * 3.2;
+
+    const wall = material(
+        wallColors[
+            Math.floor(Math.random() * wallColors.length)
+        ]
+    );
+
+    // Main building
+    createBox(
+        0, height / 2, 0,
+        width, height, 7,
+        wall,
+        house
+    );
+
+    // Roof
+    createBox(
+        0, height + 0.25, 0,
+        width + 0.7, 0.5, 7.7,
+        material(0x594c48),
+        house
+    );
+
+    // Windows
+    createWindows(
+        house,
+        width - 1,
+        height,
+        floors
+    );
+
+    // Main door
+    createBox(
+        0, 1.2, 3.57,
+        1.6, 2.4, 0.15,
+        material(0x593526),
+        house
+    );
+
+    // Door decoration
+    createBox(
+        0, 2.5, 3.68,
+        2, 0.12, 0.12,
+        material(0xffcf64),
+        house
+    );
+
+    // Balcony on upper floors
+    if (floors > 1) {
+
+        for (let floor = 1; floor < floors; floor++) {
+
+            createBox(
+                0,
+                floor * 3.2 + 0.15,
+                4,
+                width * 0.65,
+                0.15,
+                1,
+                material(0xb7a99b),
+                house
+            );
+
+            createBox(
+                0,
+                floor * 3.2 + 0.65,
+                4.4,
+                width * 0.65,
+                0.9,
+                0.1,
+                material(0x655c57),
+                house
+            );
+
         }
-      }
-      initFloatingDiyas();
 
-      // ---------- update & draw floating diyas (animated) ----------
-      function drawFloatingDiyas(time) {
-        ctx.shadowBlur = 25;
-        floatingDiyas.forEach(d => {
-          // gentle floating motion
-          d.y -= d.speedY * 0.6;  // slow upward drift
-          d.x += d.speedX * 0.4 + Math.sin(time * 0.002 + d.phase) * 0.2;
+    }
 
-          // wrap around: if goes too high, reset to bottom area (above homes but below sky)
-          if (d.y < 30) {
-            d.y = GROUND_Y - 120 - Math.random() * 70;
-            d.x = Math.random() * W;
-          }
-          if (d.x < -20) d.x = W + 20;
-          if (d.x > W + 20) d.x = -20;
+    // Diwali lights
+    createLightString(
+        house,
+        width,
+        height - 0.2
+    );
 
-          // draw glowing diya / floating lamp
-          const flicker = 0.8 + 0.4 * Math.sin(time * 0.01 + d.phase);
-          const rad = d.radius * (0.9 + 0.2 * Math.sin(time * 0.02 + d.phase));
+    // Position house
+    house.position.set(x, 0, z);
 
-          // outer glow (big)
-          ctx.globalAlpha = 0.35 + 0.15 * flicker;
-          ctx.shadowColor = '#ffaa33';
-          ctx.shadowBlur = 28;
-          ctx.fillStyle = '#ffb347';
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, rad * 2.4, 0, Math.PI * 2);
-          ctx.fill();
+    scene.add(house);
 
-          // main flame / lamp body
-          ctx.globalAlpha = 0.95;
-          ctx.shadowBlur = 20;
-          ctx.shadowColor = '#ff8c42';
-          ctx.fillStyle = '#ffaa33';
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, rad * 0.9, 0, Math.PI * 2);
-          ctx.fill();
+    return house;
 
-          // inner bright core
-          ctx.globalAlpha = 1.0;
-          ctx.shadowBlur = 16;
-          ctx.fillStyle = '#fff7b0';
-          ctx.beginPath();
-          ctx.arc(d.x - rad * 0.2, d.y - rad * 0.2, rad * 0.55, 0, Math.PI * 2);
-          ctx.fill();
+}
 
-          // tiny sparkles
-          ctx.globalAlpha = 0.6;
-          ctx.fillStyle = '#fff0b0';
-          ctx.shadowBlur = 12;
-          ctx.beginPath();
-          ctx.arc(d.x + rad * 0.8, d.y - rad * 0.6, rad * 0.2, 0, Math.PI * 2);
-          ctx.fill();
-        });
+// ==========================================
+// CITY BUILDINGS
+// ==========================================
 
-        // reset
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 1.0;
-      }
+// Residential buildings on both sides
 
-      // ---------- draw light rays / festive glow (subtle animated) ----------
-      function drawAmbientGlow(time) {
-        // soft glow near ground (from diyas)
-        const groundGlow = ctx.createRadialGradient(W/2, GROUND_Y-40, 50, W/2, GROUND_Y, 400);
-        groundGlow.addColorStop(0, 'rgba(255, 180, 70, 0.08)');
-        groundGlow.addColorStop(0.7, 'rgba(255, 140, 40, 0.02)');
-        groundGlow.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = groundGlow;
-        ctx.fillRect(0, GROUND_Y-100, W, 200);
+for (let z = -65; z <= 65; z += 18) {
 
-        // moving light specks (like fireflies / tiny diyas)
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = '#ffbb33';
-        for (let i = 0; i < 12; i++) {
-          const angle = time * 0.0005 + i * 0.9;
-          const x = W/2 + Math.sin(angle) * (W*0.45) + Math.cos(i*2.3) * 60;
-          const y = GROUND_Y - 80 + Math.cos(angle * 1.7) * 50 + Math.sin(i*1.8) * 20;
-          const size = 1.8 + Math.sin(time*0.01 + i)*1.2;
-          ctx.globalAlpha = 0.5 + 0.3 * Math.sin(time*0.02 + i);
-          ctx.fillStyle = '#ffd966';
-          ctx.beginPath();
-          ctx.arc(x, y, size, 0, Math.PI*2);
-          ctx.fill();
-        }
-        ctx.globalAlpha = 1.0;
-        ctx.shadowBlur = 0;
-      }
+    createHouse(-17, z, 1 + Math.floor(Math.random() * 3));
+    createHouse(17, z, 1 + Math.floor(Math.random() * 3));
 
-      // ---------- utility for rounded rectangles ----------
-      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-        if (w < 2 * r) r = w / 2;
-        if (h < 2 * r) r = h / 2;
-        this.moveTo(x + r, y);
-        this.lineTo(x + w - r, y);
-        this.quadraticCurveTo(x + w, y, x + w, y + r);
-        this.lineTo(x + w, y + h - r);
-        this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        this.lineTo(x + r, y + h);
-        this.quadraticCurveTo(x, y + h, x, y + h - r);
-        this.lineTo(x, y + r);
-        this.quadraticCurveTo(x, y, x + r, y);
-        return this;
-      };
+    createHouse(-47, z, 1 + Math.floor(Math.random() * 3));
+    createHouse(47, z, 1 + Math.floor(Math.random() * 3));
 
-      // ---------- animation loop ----------
-      let startTime = performance.now();
+}
 
-      function animate(now) {
-        const time = now - startTime;
+// ==========================================
+// STREET LAMPS
+// ==========================================
 
-        // 1. sky & static stars (redraw each frame – stars static)
-        drawSky();
+function createStreetLamp(x, z) {
 
-        // 2. ambient background glow (animated softly)
-        drawAmbientGlow(time);
+    const poleMaterial = material(0x252b36);
 
-        // 3. draw homes & buildings (static but with glow)
-        drawHomes();
+    // Pole
+    createBox(
+        x, 3, z,
+        0.18, 6, 0.18,
+        poleMaterial
+    );
 
-        // 4. floating diyas (animated)
-        drawFloatingDiyas(time);
+    // Lamp arm
+    createBox(
+        x + 0.7, 5.8, z,
+        1.5, 0.15, 0.15,
+        poleMaterial
+    );
 
-        // 5. extra: subtle moving light streaks (like string lights)
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 0.3;
-        ctx.strokeStyle = '#ffb347';
-        ctx.lineWidth = 1.2;
-        for (let s = 0; s < 6; s++) {
-          const offset = Math.sin(time * 0.002 + s) * 30;
-          ctx.beginPath();
-          ctx.moveTo(0, 120 + s * 40 + offset);
-          ctx.lineTo(W, 100 + s * 35 - offset * 0.5);
-          ctx.strokeStyle = `rgba(255, 180, 70, ${0.06 + 0.03 * Math.sin(time*0.005 + s)})`;
-          ctx.stroke();
-        }
-        ctx.globalAlpha = 1.0;
+    // Bulb
+    const bulb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.35, 12, 12),
+        new THREE.MeshBasicMaterial({
+            color: 0xffd68a
+        })
+    );
 
-        requestAnimationFrame(animate);
-      }
+    bulb.position.set(x + 1.3, 5.6, z);
 
-      // start animation
-      requestAnimationFrame(animate);
-    })();
-  </script>
-</body>
+    scene.add(bulb);
+
+    // Light source
+    const lampLight = new THREE.PointLight(
+        0xffbd69,
+        2,
+        18
+    );
+
+    lampLight.position.set(x + 1.3, 5.4, z);
+
+    scene.add(lampLight);
+
+}
+
+for (let z = -70; z <= 70; z += 20) {
+
+    createStreetLamp(-11, z);
+    createStreetLamp(11, z);
+
+}
+
+// ==========================================
+// TREES
+// ==========================================
+
+function createTree(x, z) {
+
+    const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.25, 0.4, 3, 8),
+        material(0x62402a)
+    );
+
+    trunk.position.set(x, 1.5, z);
+    scene.add(trunk);
+
+    const leaves = new THREE.Mesh(
+        new THREE.SphereGeometry(2, 10, 10),
+        material(0x17633c)
+    );
+
+    leaves.position.set(x, 4, z);
+    leaves.scale.set(1, 1.3, 1);
+
+    scene.add(leaves);
+
+}
+
+for (let z = -65; z <= 65; z += 22) {
+
+    createTree(-24, z);
+    createTree(24, z);
+
+}
+
+// ==========================================
+// DIYA DECORATION
+// ==========================================
+
+function createDiya(x, z) {
+
+    const bowl = new THREE.Mesh(
+        new THREE.SphereGeometry(0.3, 12, 8),
+        material(0xc66a26)
+    );
+
+    bowl.scale.y = 0.4;
+    bowl.position.set(x, 0.18, z);
+
+    scene.add(bowl);
+
+    const flame = new THREE.Mesh(
+        new THREE.ConeGeometry(0.09, 0.35, 8),
+        new THREE.MeshBasicMaterial({
+            color: 0xffa52e
+        })
+    );
+
+    flame.position.set(x, 0.38, z);
+    scene.add(flame);
+
+    const diyaLight = new THREE.PointLight(
+        0xff9b34,
+        0.8,
+        4
+    );
+
+    diyaLight.position.set(x, 0.5, z);
+    scene.add(diyaLight);
+
+}
+
+for (let z = -65; z <= 65; z += 10) {
+
+    createDiya(-10.2, z);
+    createDiya(10.2, z);
+
+}
+
+// ==========================================
+// MOON
+// ==========================================
+
+const moon = new THREE.Mesh(
+    new THREE.SphereGeometry(5, 32, 32),
+    new THREE.MeshBasicMaterial({
+        color: 0xffe6ae
+    })
+);
+
+moon.position.set(-45, 45, -80);
+scene.add(moon);
+
+// ==========================================
+// STARS
+// ==========================================
+
+const starGeometry = new THREE.BufferGeometry();
+
+const starPositions = [];
+
+for (let i = 0; i < 700; i++) {
+
+    starPositions.push(
+        (Math.random() - 0.5) * 250,
+        15 + Math.random() * 100,
+        (Math.random() - 0.5) * 250
+    );
+
+}
+
+starGeometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(starPositions, 3)
+);
+
+const stars = new THREE.Points(
+    starGeometry,
+    new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.35
+    })
+);
+
+scene.add(stars);
+
+// ==========================================
+// PART 2 COMPLETE
+// PART 3 WILL ADD PLAYER AND HUMANS
+// ==========================================
+
+</script>
+</head>
 </html>
