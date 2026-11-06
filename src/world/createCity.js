@@ -85,6 +85,7 @@ function addGround(scene) {
     dash.position.set(0, 0.012, z);
     scene.add(dash);
   }
+  addZebraCrossings(scene);
 }
 
 function addHouse(scene, x, z, side, floors, palette, decorations, blockers) {
@@ -296,6 +297,73 @@ function addDiya(scene, x, z, decorations) {
   decorations.flames.push(flame);
 }
 
+
+function addZebraCrossings(scene) {
+  const paint = new THREE.MeshBasicMaterial({ color: 0xf2eee5, transparent: true, opacity: 0.88 });
+  const addStripe = (x, z, width, depth) => {
+    const stripe = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), paint);
+    stripe.rotation.x = -Math.PI / 2;
+    stripe.position.set(x, 0.018, z);
+    scene.add(stripe);
+  };
+  [-120, 0, 120].forEach((z) => {
+    for (let offset = -7; offset <= 7; offset += 2.2) addStripe(0, z + offset, 10.5, 0.72);
+    for (let offset = -7; offset <= 7; offset += 2.2) addStripe(offset, z, 7.2, 0.55);
+  });
+  const stopLine = new THREE.MeshBasicMaterial({ color: 0xf0dfbd });
+  [-105, 105].forEach((x) => {
+    [-120, 0, 120].forEach((z) => {
+      const line = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 0.22), stopLine);
+      line.rotation.x = -Math.PI / 2;
+      line.position.set(x, 0.02, z - 5.5);
+      scene.add(line);
+    });
+  });
+}
+
+function addRangoli(scene, x, z, variant = 0) {
+  const group = new THREE.Group();
+  const colors = [0xff5b63, 0xffd166, 0x55d6a5, 0x62c9ff, 0xc49bff];
+  const outer = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.075, 6, 32), new THREE.MeshBasicMaterial({ color: colors[variant % colors.length] }));
+  outer.rotation.x = -Math.PI / 2; outer.position.y = 0.045; group.add(outer);
+  const inner = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.055, 6, 28), new THREE.MeshBasicMaterial({ color: colors[(variant + 1) % colors.length] }));
+  inner.rotation.x = -Math.PI / 2; inner.position.y = 0.05; group.add(inner);
+  for (let petal = 0; petal < 12; petal += 1) {
+    const angle = petal * Math.PI / 6;
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.19, 8, 6), new THREE.MeshBasicMaterial({ color: colors[(petal + variant) % colors.length] }));
+    dot.scale.set(1.25, 0.18, 0.62);
+    dot.position.set(Math.cos(angle) * 0.83, 0.065, Math.sin(angle) * 0.83);
+    dot.rotation.y = -angle; group.add(dot);
+  }
+  const centre = new THREE.Mesh(new THREE.CircleGeometry(0.22, 16), new THREE.MeshBasicMaterial({ color: 0xffe5a8, side: THREE.DoubleSide }));
+  centre.rotation.x = -Math.PI / 2; centre.position.y = 0.06; group.add(centre);
+  group.position.set(x, 0, z); scene.add(group);
+}
+
+function addRoadFestoon(scene, z, decorations) {
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-28, 6.1, z), new THREE.Vector3(-14, 5.25, z),
+    new THREE.Vector3(0, 5.0, z), new THREE.Vector3(14, 5.25, z),
+    new THREE.Vector3(28, 6.1, z)
+  ]);
+  scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 24, 0.035, 5, false), new THREE.MeshStandardMaterial({ color: 0x302a2b, metalness: 0.35 })));
+  const colors = [0xff5b4d, 0xffd166, 0x63d9ff, 0x80ed99, 0xff83c7];
+  for (let i = 0; i <= 12; i += 1) {
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 8), new THREE.MeshBasicMaterial({ color: colors[i % colors.length] }));
+    bulb.position.copy(curve.getPoint(i / 12)); bulb.position.y -= 0.18;
+    scene.add(bulb); decorations.bulbs.push(bulb);
+  }
+}
+
+function addRoadsideCrackerDisplay(scene, x, z) {
+  const colors = [0xff6b5e, 0xffc857, 0x59c6ee];
+  for (let i = 0; i < 3; i += 1) {
+    const pack = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.19, 0.48, 8), new THREE.MeshStandardMaterial({ color: colors[i], roughness: 0.72, metalness: 0.08 }));
+    pack.position.set(x + (i - 1) * 0.34, 0.25, z + (i % 2) * 0.12);
+    pack.rotation.z = (i - 1) * 0.12; pack.castShadow = true; scene.add(pack);
+  }
+}
+
 function addSky(scene) {
   const moon = new THREE.Mesh(
     new THREE.SphereGeometry(3.8, 24, 24),
@@ -359,11 +427,21 @@ export function createCity(scene) {
     addTree(scene, 81, z + 21);
   }
 
+  for (let z = -224; z <= 224; z += 112) addRoadFestoon(scene, z, decorations);
+  for (let z = -240; z <= 240; z += 48) {
+    addRoadsideCrackerDisplay(scene, -19.2, z + 12);
+    addRoadsideCrackerDisplay(scene, 19.2, z - 12);
+  }
   for (let z = -240; z <= 240; z += 24) {
     addDiya(scene, -22.05, z, decorations);
     addDiya(scene, 22.05, z, decorations);
   }
 
+  for (let z = -220; z <= 220; z += 60) {
+    if ([-120, 0, 120].some((crossing) => Math.abs(z - crossing) < 18)) continue;
+    addRangoli(scene, -48.8, z, Math.abs(Math.floor(z / 60)));
+    addRangoli(scene, 48.8, z + 18, Math.abs(Math.floor(z / 60)) + 2);
+  }
   return {
     isBlocked(x, z, radius = 0.48) {
       return blockers.some((item) =>
