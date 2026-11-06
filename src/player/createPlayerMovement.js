@@ -10,13 +10,12 @@ export function createPlayerMovement({ THREE, player, city, input, speed = 5 }) 
       return false;
     }
 
-    // Movement is relative to the camera only. Player facing is output, never input.
+    // Camera-relative direction; joystick displacement controls walking intensity.
     const cameraYaw = input.getCamera().yaw;
     const forwardX = Math.sin(cameraYaw);
     const forwardZ = Math.cos(cameraYaw);
     const rightX = Math.cos(cameraYaw);
     const rightZ = -Math.sin(cameraYaw);
-
     const moveX = rightX * intent.x + forwardX * intent.y;
     const moveZ = rightZ * intent.x + forwardZ * intent.y;
     const magnitude = Math.hypot(moveX, moveZ);
@@ -27,11 +26,9 @@ export function createPlayerMovement({ THREE, player, city, input, speed = 5 }) 
 
     const directionX = moveX / magnitude;
     const directionZ = moveZ / magnitude;
-    const distance = speed * frameDelta;
+    const distance = speed * frameDelta * Math.min(inputLength, 1);
     const nextX = THREE.MathUtils.clamp(position.x + directionX * distance, -84, 84);
     const nextZ = THREE.MathUtils.clamp(position.z + directionZ * distance, -84, 84);
-
-    // Resolve each axis independently so walls do not stop movement along the free axis.
     if (!city.isBlocked(nextX, position.z)) position.x = nextX;
     if (!city.isBlocked(position.x, nextZ)) position.z = nextZ;
 
