@@ -2,6 +2,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 import { createCity } from "./world/createCity.js";
 import { createPedestrians } from "./world/createPedestrians.js";
 import { createCharacter } from "./player/createCharacter.js";
+import { createCar } from "./player/createCar.js";
+import { createVehicleMovement } from "./player/createVehicleMovement.js";
 import { createPlayerMovement } from "./player/createPlayerMovement.js";
 import { createFollowCamera } from "./camera/createFollowCamera.js";
 import { createInputController } from "./controls/createInputController.js";
@@ -30,6 +32,7 @@ const sensitivityValue = $("#movement-sensitivity-value");
 const pausePanel = $("#pause-panel");
 const resumeButton = $("#resume-button");
 const fireButton = $("#fire-button");
+const carButton = $("#car-button");
 const toast = $("#toast");
 
 const scene = new THREE.Scene();
@@ -71,10 +74,13 @@ const input = createInputController({
   cameraButton: $("#camera-button")
 });
 const movement = createPlayerMovement({ THREE, player, city, input, speed: 7.5 });
+const car = createCar(scene);
+const vehicleMovement = createVehicleMovement({ THREE, player, car, city, input });
 const followCamera = createFollowCamera({ THREE, camera, player, input });
 
 const clock = new THREE.Clock();
 let hasEnteredCity = false;
+let driving = false;
 let paused = false;
 let settingsOpen = false;
 let elapsed = 0;
@@ -106,6 +112,32 @@ function setPaused(nextState) {
   pauseButton.setAttribute("aria-label", paused ? "Resume game" : "Pause game");
   input.reset();
   if (paused) showToast("Game paused");
+}
+
+function toggleDriving() {
+  if (!hasEnteredCity || paused || settingsOpen) return;
+  driving = !driving;
+  input.reset();
+  if (driving) {
+    car.root.position.copy(player.root.position);
+    car.root.rotation.y = player.root.rotation.y;
+    car.setVisible(true);
+    player.root.visible = false;
+    carButton.classList.add("is-driving");
+    carButton.querySelector("small").textContent = "EXIT CAR";
+    carButton.setAttribute("aria-label", "Exit car");
+    helpTip.textContent = "Joystick / W A S D to drive · Drag to rotate camera";
+    showToast("You're in the driver's seat");
+  } else {
+    vehicleMovement.stop();
+    car.setVisible(false);
+    player.root.visible = true;
+    carButton.classList.remove("is-driving");
+    carButton.querySelector("small").textContent = "DRIVE";
+    carButton.setAttribute("aria-label", "Get in the car");
+    helpTip.textContent = "Move with the joystick or use WASD · Drag to rotate camera";
+    showToast("Back on foot");
+  }
 }
 
 function enterCity() {
@@ -143,6 +175,7 @@ function applyMovementSettings() {
 startButton.addEventListener("click", enterCity);
 pauseButton.addEventListener("click", () => setPaused(!paused));
 settingsButton.addEventListener("click", openSettings);
+carButton.addEventListener("click", toggleDriving);
 settingsClose.addEventListener("click", closeSettings);
 settingsOverlay.addEventListener("click", (event) => {
   if (event.target === settingsOverlay) closeSettings();
@@ -190,7 +223,8 @@ function animate() {
   elapsed += delta;
   updateWorld(delta);
   if (hasEnteredCity && !paused && !settingsOpen) {
-    movement.update(delta, elapsed);
+    if (driving) vehicleMovement.update(delta);
+    else movement.update(delta, elapsed);
     const x = player.root.position.x;
     const z = player.root.position.z;
     const templeDistance = Math.hypot(x - 205, z - 65);
