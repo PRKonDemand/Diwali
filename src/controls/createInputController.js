@@ -39,7 +39,7 @@ export function createInputController({ canvas, joystickBase, joystickKnob, came
     } else {
       const adjustedStrength = Math.min(1, (strength - deadZone) / (1 - deadZone));
       movement.x = normalizedX / strength * adjustedStrength;
-      movement.y = normalizedY / strength * adjustedStrength;
+      movement.y = Math.abs(normalizedY) < 1e-9 ? 0 : normalizedY / strength * adjustedStrength;
     }
     joystickKnob.style.left = "calc(50% + " + dx + "px)";
     joystickKnob.style.top = "calc(50% + " + dy + "px)";
