@@ -7,6 +7,7 @@ import { createFollowCamera } from "./camera/createFollowCamera.js";
 import { createInputController } from "./controls/createInputController.js";
 import { createFireworks } from "./effects/createFireworks.js";
 import { createFestivalAudio } from "./effects/createFestivalAudio.js";
+import { createFestivalAtmosphere } from "./effects/createFestivalAtmosphere.js";
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $("#world");
@@ -62,6 +63,7 @@ const player = createCharacter(scene, {
 const pedestrians = createPedestrians(scene, 30);
 const festivalAudio = createFestivalAudio();
 const fireworks = createFireworks(scene, () => festivalAudio.playBurst());
+const festivalAtmosphere = createFestivalAtmosphere(scene);
 const input = createInputController({
   canvas,
   joystickBase: $("#joystick-base"),
@@ -179,6 +181,7 @@ function updateWorld(delta) {
   city.update(elapsed);
   pedestrians.update(delta, elapsed, false);
   fireworks.update(delta);
+  festivalAtmosphere.update(delta, elapsed);
 }
 
 function animate() {
