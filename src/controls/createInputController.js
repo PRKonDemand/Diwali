@@ -1,6 +1,6 @@
 export function createInputController({ canvas, joystickBase, joystickKnob, cameraButton }) {
   const keys = new Set();
-  const state = { cameraYaw: 0, cameraDistance: 8.5 };
+  const state = { cameraYaw: 0, cameraDistance: 8.5, sensitivity: 1 };
   const movement = { x: 0, y: 0 };
   let joystickPointer = null;
   let cameraPointer = null;
@@ -38,8 +38,9 @@ export function createInputController({ canvas, joystickBase, joystickKnob, came
       movement.y = 0;
     } else {
       const adjustedStrength = Math.min(1, (strength - deadZone) / (1 - deadZone));
-      movement.x = normalizedX / strength * adjustedStrength;
-      movement.y = Math.abs(normalizedY) < 1e-9 ? 0 : normalizedY / strength * adjustedStrength;
+      const responsiveStrength = Math.pow(adjustedStrength, 1 / state.sensitivity);
+      movement.x = normalizedX / strength * responsiveStrength;
+      movement.y = Math.abs(normalizedY) < 1e-9 ? 0 : normalizedY / strength * responsiveStrength;
     }
     joystickKnob.style.left = "calc(50% + " + dx + "px)";
     joystickKnob.style.top = "calc(50% + " + dy + "px)";
@@ -118,6 +119,9 @@ export function createInputController({ canvas, joystickBase, joystickKnob, came
       return { x, y };
     },
     getCamera() { return { yaw: state.cameraYaw, distance: state.cameraDistance }; },
+    setSensitivity(value) {
+      state.sensitivity = Math.min(2, Math.max(0.5, Number(value) || 1));
+    },
     reset() { clearMovement(); }
   };
 }
