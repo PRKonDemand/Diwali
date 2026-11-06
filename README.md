@@ -5,13 +5,13 @@ A browser-based 3D Indian neighbourhood festival simulator built with Three.js. 
 ## Project structure
 
 - `index.html` — semantic app shell, intro screen and game HUD.
-- `styles.css` — responsive styling, safe-area spacing and touch controls.
-- `src/main.js` — app composition, Three.js renderer, lifecycle, game loop and system coordination.
-- `src/world/createCity.js` — roads, walkways, houses, lights, trees, diyas, sky and house collision boundaries.
+- `styles.css` — responsive styling, safe-area spacing, directional buttons and touch feedback.
+- `src/main.js` — app composition, renderer, lifecycle, game loop and system coordination.
+- `src/world/createCity.js` — roads, walkways, houses, lights, trees, diyas, sky and collision boundaries.
 - `src/world/createPedestrians.js` — ambient walkers and child-sized pedestrians.
 - `src/player/createCharacter.js` — reusable character model and walk animation.
-- `src/controls/createInputController.js` — keyboard, touch joystick and camera drag/zoom input.
-- `src/effects/createFireworks.js` — visual-only particle bursts with geometry/material cleanup.
+- `src/controls/createInputController.js` — hold-to-move directional buttons, keyboard controls and camera drag/zoom.
+- `src/effects/createFireworks.js` — visual-only particle bursts with GPU resource cleanup.
 
 ## Runtime
 
@@ -20,21 +20,22 @@ Three.js is imported as an ES module from jsDelivr. No bundler is required for t
 ## Architecture rules
 
 1. `main.js` coordinates systems; feature implementation belongs in its own module.
-2. World generation and world collision data stay in `src/world/`.
+2. World generation and collision data stay in `src/world/`.
 3. Character creation and animation stay in `src/player/`.
-4. Input devices stay in `src/controls/`; they expose state instead of directly moving scene objects.
-5. Visual effects stay in `src/effects/` and must dispose temporary GPU resources.
-6. Keep game state in memory for this single-player simulator; do not add a backend or browser storage without a clear requirement.
-
-## Progress
-
-- Part 1 — app shell, responsive HUD and Three.js foundation.
-- Part 2 — modular Diwali neighbourhood environment.
-- Part 3 — player character, keyboard/touch movement, camera follow, pedestrians, pause/resume and visual fireworks.
+4. Input handling stays in `src/controls/`; it returns movement state and never directly mutates the player or scene.
+5. Visual effects stay in `src/effects/` and dispose temporary GPU resources.
+6. Keep single-player state in memory; add backend or browser storage only when a clear requirement exists.
+7. Keep UI structure in HTML, presentation in CSS and interaction/game orchestration in JavaScript.
 
 ## Controls
 
-- Desktop: WASD or arrow keys to move; drag the scene to orbit the camera.
-- Mobile: use the on-screen joystick; drag the scene to orbit the camera.
+- Mobile: press and hold one of the four directional arrow buttons to move; release to stop.
+- Desktop: WASD or arrow keys to move.
+- Drag the 3D scene to rotate the camera.
 - Camera button: cycle camera distance.
 - Fireworks button: trigger a decorative in-game particle burst.
+- Pause button: pause/resume simulation.
+
+## Validation notes
+
+The repository is designed as a static ES-module website. Validate with a static server and a real mobile browser for touch/pointer behaviour; a GitHub file update alone does not prove runtime or device compatibility.
