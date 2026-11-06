@@ -191,8 +191,13 @@ function animate() {
   updateWorld(delta);
   if (hasEnteredCity && !paused && !settingsOpen) {
     movement.update(delta, elapsed);
+    const x = player.root.position.x;
     const z = player.root.position.z;
-    locationLabel.textContent = Math.abs(z) < 54 ? "Main Street" : "Festival Lane";
+    const templeDistance = Math.hypot(x - 205, z - 65);
+    const plazaDistance = Math.hypot(x + 205, z - 65);
+    if (templeDistance < 34) locationLabel.textContent = "Lakshmi–Ganesh Mandir";
+    else if (plazaDistance < 34) locationLabel.textContent = "Food & Social Plaza";
+    else locationLabel.textContent = Math.abs(z) < 54 ? "Main Street" : "Festival Lane";
   }
   if (hasEnteredCity) followCamera.update(delta);
   renderer.render(scene, camera);
