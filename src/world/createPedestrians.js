@@ -43,7 +43,7 @@ export function createPedestrians(scene, count = 12) {
       skinColor: SKINS[(index + 1) % SKINS.length],
       trouserColor: index % 2 ? 0x293448 : 0x514034
     });
-    celebrators.push({ person, phase: Math.random() * Math.PI * 2, baseY: 0 });
+    celebrators.push({ person, phase: Math.random() * Math.PI * 2, baseRotation: person.root.rotation.y });
   }
 
   return {
@@ -56,11 +56,11 @@ export function createPedestrians(scene, count = 12) {
         }
         walker.person.updateWalk(elapsed + walker.phase, !paused);
       });
-      celebrators.forEach(({ person, phase }) => {
+      celebrators.forEach(({ person, phase, baseRotation }) => {
         person.updateWalk(elapsed + phase, false);
         if (!paused) {
           person.root.position.y = Math.max(0, Math.sin(elapsed * 2.4 + phase) * 0.07);
-          person.root.rotation.y += Math.sin(elapsed * 1.8 + phase) * delta * 0.12;
+          person.root.rotation.y = baseRotation + Math.sin(elapsed * 1.8 + phase) * 0.12;
         }
       });
     }
