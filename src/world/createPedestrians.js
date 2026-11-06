@@ -5,6 +5,7 @@ const SKINS = [0xb97955, 0xd49a72, 0x986448, 0xe0b18b];
 
 export function createPedestrians(scene, count = 12) {
   const walkers = [];
+  const celebrators = [];
   const lanes = [-30.6, 30.6, -95.4, 95.4];
 
   for (let index = 0; index < count; index += 1) {
@@ -30,6 +31,21 @@ export function createPedestrians(scene, count = 12) {
     });
   }
 
+  for (let index = 0; index < 12; index += 1) {
+    const side = index % 2 === 0 ? -1 : 1;
+    const z = -210 + Math.floor(index / 2) * 72 + (Math.random() - 0.5) * 10;
+    const person = createCharacter(scene, {
+      x: side * (36 + Math.random() * 5),
+      z,
+      scale: 0.82 + Math.random() * 0.12,
+      rotation: side < 0 ? Math.PI / 2 : -Math.PI / 2,
+      shirtColor: SHIRTS[(index + 2) % SHIRTS.length],
+      skinColor: SKINS[(index + 1) % SKINS.length],
+      trouserColor: index % 2 ? 0x293448 : 0x514034
+    });
+    celebrators.push({ person, phase: Math.random() * Math.PI * 2, baseY: 0 });
+  }
+
   return {
     update(delta, elapsed, paused) {
       walkers.forEach((walker) => {
@@ -39,6 +55,13 @@ export function createPedestrians(scene, count = 12) {
           if (walker.person.root.position.z < -228) walker.person.root.position.z = 228;
         }
         walker.person.updateWalk(elapsed + walker.phase, !paused);
+      });
+      celebrators.forEach(({ person, phase }) => {
+        person.updateWalk(elapsed + phase, false);
+        if (!paused) {
+          person.root.position.y = Math.max(0, Math.sin(elapsed * 2.4 + phase) * 0.07);
+          person.root.rotation.y += Math.sin(elapsed * 1.8 + phase) * delta * 0.12;
+        }
       });
     }
   };
