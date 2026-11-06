@@ -32,9 +32,9 @@ const toast = $("#toast");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x080d1b);
-scene.fog = new THREE.Fog(0x080d1b, 42, 155);
+scene.fog = new THREE.Fog(0x080d1b, 126, 465);
 
-const camera = new THREE.PerspectiveCamera(62, 1, 0.1, 260);
+const camera = new THREE.PerspectiveCamera(62, 1, 0.1, 900);
 camera.position.set(0, 5.2, -7);
 camera.lookAt(0, 1.2, 5);
 
@@ -58,7 +58,7 @@ const player = createCharacter(scene, {
   trouserColor: 0x263248,
   skinColor: 0xc98762
 });
-const pedestrians = createPedestrians(scene, 14);
+const pedestrians = createPedestrians(scene, 30);
 const fireworks = createFireworks(scene);
 const input = createInputController({
   canvas,
@@ -186,7 +186,7 @@ function animate() {
   if (hasEnteredCity && !paused && !settingsOpen) {
     movement.update(delta, elapsed);
     const z = player.root.position.z;
-    locationLabel.textContent = Math.abs(z) < 18 ? "Main Street" : "Festival Lane";
+    locationLabel.textContent = Math.abs(z) < 54 ? "Main Street" : "Festival Lane";
   }
   if (hasEnteredCity) followCamera.update(delta);
   renderer.render(scene, camera);
