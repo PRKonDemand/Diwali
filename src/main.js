@@ -2,6 +2,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 import { createCity } from "./world/createCity.js";
 import { createPedestrians } from "./world/createPedestrians.js";
 import { createCharacter } from "./player/createCharacter.js";
+import { createPlayerMovement } from "./player/createPlayerMovement.js";
+import { createFollowCamera } from "./camera/createFollowCamera.js";
 import { createInputController } from "./controls/createInputController.js";
 import { createFireworks } from "./effects/createFireworks.js";
 
@@ -55,10 +57,10 @@ const input = createInputController({
   directionButtons: document.querySelectorAll("[data-direction]"),
   cameraButton: $("#camera-button")
 });
+const movement = createPlayerMovement({ THREE, player, city, input, speed: 2.8 });
+const followCamera = createFollowCamera({ THREE, camera, player, input });
 
 const clock = new THREE.Clock();
-const cameraTarget = new THREE.Vector3();
-const desiredCameraPosition = new THREE.Vector3();
 let hasEnteredCity = false;
 let paused = false;
 let elapsed = 0;
@@ -119,71 +121,26 @@ fireButton.addEventListener("click", () => {
   showToast("A little festival sparkle!");
 });
 
-function updatePlayer(delta) {
-  if (paused || !hasEnteredCity) {
-    player.updateWalk(elapsed, false);
-    return;
-  }
-
-  const movement = input.getMovement();
-  const cameraInput = input.getCamera();
-  const viewYaw = player.root.rotation.y + cameraInput.yaw;
-  const forwardX = Math.sin(viewYaw);
-  const forwardZ = Math.cos(viewYaw);
-  const rightX = Math.cos(viewYaw);
-  const rightZ = -Math.sin(viewYaw);
-
-  const moveX = rightX * movement.x + forwardX * movement.y;
-  const moveZ = rightZ * movement.x + forwardZ * movement.y;
-  const magnitude = Math.hypot(moveX, moveZ);
-  const isMoving = magnitude > 0.08;
-
-  if (isMoving) {
-    const step = 4.25 * delta;
-    const nextX = THREE.MathUtils.clamp(player.root.position.x + moveX * step, -84, 84);
-    const nextZ = THREE.MathUtils.clamp(player.root.position.z + moveZ * step, -84, 84);
-
-    if (!city.isBlocked(nextX, player.root.position.z)) {
-      player.root.position.x = nextX;
-    }
-    if (!city.isBlocked(player.root.position.x, nextZ)) {
-      player.root.position.z = nextZ;
-    }
-    player.root.rotation.y = Math.atan2(moveX, moveZ);
-  }
-
-  player.updateWalk(elapsed, isMoving);
-  locationLabel.textContent = Math.abs(player.root.position.z) < 18 ? "Main Street" : "Festival Lane";
-}
-
-function updateCamera(delta) {
-  const cameraInput = input.getCamera();
-  const yaw = player.root.rotation.y + cameraInput.yaw;
-  const distance = cameraInput.distance;
-  desiredCameraPosition.set(
-    player.root.position.x - Math.sin(yaw) * distance,
-    player.root.position.y + 4.1 + distance * 0.16,
-    player.root.position.z - Math.cos(yaw) * distance
-  );
-  const smoothing = 1 - Math.exp(-delta * 5.5);
-  camera.position.lerp(desiredCameraPosition, smoothing);
-  cameraTarget.set(player.root.position.x, 1.15, player.root.position.z);
-  camera.lookAt(cameraTarget);
+function updateWorld(delta) {
+  if (paused || !hasEnteredCity) return;
+  city.update(elapsed);
+  pedestrians.update(delta, elapsed, false);
+  fireworks.update(delta);
 }
 
 function animate() {
   requestAnimationFrame(animate);
-  const delta = Math.min(clock.getDelta(), 0.05);
+  const delta = Math.min(clock.getDelta(), 1 / 30);
   elapsed += delta;
 
-  if (!paused) {
-    city.update(elapsed);
-    pedestrians.update(delta, elapsed, false);
-    fireworks.update(delta);
+  updateWorld(delta);
+  if (hasEnteredCity && !paused) {
+    movement.update(delta, elapsed);
+    const z = player.root.position.z;
+    locationLabel.textContent = Math.abs(z) < 18 ? "Main Street" : "Festival Lane";
   }
+  if (hasEnteredCity) followCamera.update(delta);
 
-  updatePlayer(delta);
-  if (hasEnteredCity) updateCamera(delta);
   renderer.render(scene, camera);
 }
 animate();
