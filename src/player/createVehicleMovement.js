@@ -9,8 +9,9 @@ export function createVehicleMovement({ THREE, player, car, city, input }) {
   function update(delta) {
     const dt = Math.min(Math.max(delta, 0), 1 / 30);
     const intent = input.getMovement();
-    const throttle = THREE.MathUtils.clamp(intent.y, -1, 1);
-    const steering = THREE.MathUtils.clamp(intent.x, -1, 1);
+    // Map the driver's directional input consistently: up accelerates, down reverses, left/right steer accordingly.
+    const throttle = THREE.MathUtils.clamp(-intent.y, -1, 1);
+    const steering = THREE.MathUtils.clamp(-intent.x, -1, 1);
 
     if (throttle > 0.04) speed = Math.min(maxForwardSpeed, speed + acceleration * throttle * dt);
     else if (throttle < -0.04) {
