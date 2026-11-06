@@ -291,9 +291,9 @@ export function createCity(scene) {
   const housePalette = [0xd99a75, 0xe7c28d, 0xc98b83, 0xd5d2b8, 0xaeb8a2, 0xc9a6d5];
   for (let z = -70; z <= 70; z += 20) {
     addHouse(scene, -18, z, "left", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
-    addHouse(scene, 18, z, "right", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations);
-    addHouse(scene, -52, z, "left", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations);
-    addHouse(scene, 52, z, "right", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations);
+    addHouse(scene, 18, z, "right", 1 + Math.floor(Math.random() * 3), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
+    addHouse(scene, -52, z, "left", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
+    addHouse(scene, 52, z, "right", 1 + Math.floor(Math.random() * 2), housePalette[Math.floor(Math.random() * housePalette.length)], decorations, blockers);
   }
 
   for (let z = -70; z <= 70; z += 28) {
