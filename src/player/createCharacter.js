@@ -74,6 +74,14 @@ export function createCharacter(scene, options = {}) {
       leftArm.rotation.x = -swing * 0.72;
       rightArm.rotation.x = swing * 0.72;
       torso.position.y = 1.12 + (moving ? Math.abs(Math.sin(time * 18)) * 0.035 : 0);
+    },
+    updateCelebrate(time) {
+      const wave = Math.sin(time * 3.2) * 0.18;
+      leftArm.rotation.z = 0.78 + wave;
+      rightArm.rotation.z = -0.78 - wave;
+      leftArm.rotation.x = Math.sin(time * 2.4) * 0.12;
+      rightArm.rotation.x = -Math.sin(time * 2.4) * 0.12;
+      torso.rotation.z = Math.sin(time * 1.8) * 0.035;
     }
   };
 }
