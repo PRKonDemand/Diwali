@@ -1,4 +1,5 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+import { createFestivalDistrict } from "./createFestivalDistrict.js";
 
 const COLORS = {
   grass: 0x3b6542,
@@ -442,6 +443,8 @@ export function createCity(scene) {
     addRangoli(scene, -48.8, z, Math.abs(Math.floor(z / 60)));
     addRangoli(scene, 48.8, z + 18, Math.abs(Math.floor(z / 60)) + 2);
   }
+  createFestivalDistrict(scene, decorations, blockers);
+
   return {
     isBlocked(x, z, radius = 0.48) {
       return blockers.some((item) =>
