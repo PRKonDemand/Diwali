@@ -1,56 +1,70 @@
-export function createInputController({ canvas, directionButtons, cameraButton }) {
+export function createInputController({ canvas, joystickBase, joystickKnob, cameraButton }) {
   const keys = new Set();
-  const pressedDirections = new Set();
-  const pointerDirections = new Map();
   const state = { cameraYaw: 0, cameraDistance: 8.5 };
+  const movement = { x: 0, y: 0 };
+  let joystickPointer = null;
   let cameraPointer = null;
   let lastPointerX = 0;
   const cameraDistances = [8.5, 11.5, 15];
+  const maxTravel = 39;
+  const deadZone = 0.1;
 
-  function setDirection(direction, pressed) {
-    if (pressed) pressedDirections.add(direction);
-    else pressedDirections.delete(direction);
-    directionButtons.forEach((button) => {
-      const active = button.dataset.direction === direction && pressed;
-      if (active) {
-        button.classList.add("is-pressed");
-        button.setAttribute("aria-pressed", "true");
-      } else if (button.dataset.direction === direction) {
-        button.classList.remove("is-pressed");
-        button.setAttribute("aria-pressed", "false");
-      }
-    });
+  function resetJoystick() {
+    joystickPointer = null;
+    movement.x = 0;
+    movement.y = 0;
+    joystickBase.classList.remove("is-active");
+    joystickKnob.style.left = "50%";
+    joystickKnob.style.top = "50%";
   }
 
-  function releasePointer(pointerId) {
-    const direction = pointerDirections.get(pointerId);
-    if (!direction) return;
-    pointerDirections.delete(pointerId);
-    setDirection(direction, false);
+  function updateJoystick(event) {
+    const rect = joystickBase.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    let dx = event.clientX - centerX;
+    let dy = event.clientY - centerY;
+    const distance = Math.hypot(dx, dy);
+    const clampedDistance = Math.min(distance, maxTravel);
+    if (distance > 0) {
+      dx = dx / distance * clampedDistance;
+      dy = dy / distance * clampedDistance;
+    }
+    const normalizedX = dx / maxTravel;
+    const normalizedY = -dy / maxTravel;
+    const strength = Math.hypot(normalizedX, normalizedY);
+    if (strength < deadZone) {
+      movement.x = 0;
+      movement.y = 0;
+    } else {
+      const adjustedStrength = Math.min(1, (strength - deadZone) / (1 - deadZone));
+      movement.x = normalizedX / strength * adjustedStrength;
+      movement.y = normalizedY / strength * adjustedStrength;
+    }
+    joystickKnob.style.left = "calc(50% + " + dx + "px)";
+    joystickKnob.style.top = "calc(50% + " + dy + "px)";
   }
 
-  directionButtons.forEach((button) => {
-    const direction = button.dataset.direction;
-    button.setAttribute("aria-pressed", "false");
-    button.addEventListener("contextmenu", (event) => event.preventDefault());
-    button.addEventListener("pointerdown", (event) => {
-      event.preventDefault();
-      pointerDirections.set(event.pointerId, direction);
-      setDirection(direction, true);
-      button.setPointerCapture(event.pointerId);
-    });
-    button.addEventListener("pointerup", (event) => releasePointer(event.pointerId));
-    button.addEventListener("pointercancel", (event) => releasePointer(event.pointerId));
-    button.addEventListener("lostpointercapture", (event) => releasePointer(event.pointerId));
-    button.addEventListener("click", (event) => event.preventDefault());
+  joystickBase.addEventListener("pointerdown", (event) => {
+    if (joystickPointer !== null) return;
+    event.preventDefault();
+    joystickPointer = event.pointerId;
+    joystickBase.classList.add("is-active");
+    joystickBase.setPointerCapture(event.pointerId);
+    updateJoystick(event);
   });
-
-  const keyToDirection = {
-    w: "up", arrowup: "up",
-    s: "down", arrowdown: "down",
-    a: "left", arrowleft: "left",
-    d: "right", arrowright: "right"
+  joystickBase.addEventListener("pointermove", (event) => {
+    if (event.pointerId === joystickPointer) updateJoystick(event);
+  });
+  const releaseJoystick = (event) => {
+    if (event.pointerId === joystickPointer) resetJoystick();
   };
+  joystickBase.addEventListener("pointerup", releaseJoystick);
+  joystickBase.addEventListener("pointercancel", releaseJoystick);
+  joystickBase.addEventListener("lostpointercapture", releaseJoystick);
+  joystickBase.addEventListener("contextmenu", (event) => event.preventDefault());
+
+  const keyToDirection = { w:"up",arrowup:"up",s:"down",arrowdown:"down",a:"left",arrowleft:"left",d:"right",arrowright:"right" };
   window.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
     if (!keyToDirection[key]) return;
@@ -61,15 +75,8 @@ export function createInputController({ canvas, directionButtons, cameraButton }
 
   function clearMovement() {
     keys.clear();
-    pointerDirections.forEach((direction) => setDirection(direction, false));
-    pointerDirections.clear();
-    pressedDirections.clear();
-    directionButtons.forEach((button) => {
-      button.classList.remove("is-pressed");
-      button.setAttribute("aria-pressed", "false");
-    });
+    resetJoystick();
   }
-
   window.addEventListener("blur", () => {
     clearMovement();
     cameraPointer = null;
@@ -83,9 +90,8 @@ export function createInputController({ canvas, directionButtons, cameraButton }
   });
   canvas.addEventListener("pointermove", (event) => {
     if (event.pointerId !== cameraPointer) return;
-    const deltaX = event.clientX - lastPointerX;
+    state.cameraYaw -= (event.clientX - lastPointerX) * 0.004;
     lastPointerX = event.clientX;
-    state.cameraYaw -= deltaX * 0.004;
   });
   const stopCameraDrag = (event) => {
     if (event.pointerId === cameraPointer) cameraPointer = null;
@@ -101,21 +107,17 @@ export function createInputController({ canvas, directionButtons, cameraButton }
 
   return {
     getMovement() {
-      let x = 0;
-      let y = 0;
-      if (keys.has("a") || keys.has("arrowleft") || pressedDirections.has("left")) x -= 1;
-      if (keys.has("d") || keys.has("arrowright") || pressedDirections.has("right")) x += 1;
-      if (keys.has("w") || keys.has("arrowup") || pressedDirections.has("up")) y += 1;
-      if (keys.has("s") || keys.has("arrowdown") || pressedDirections.has("down")) y -= 1;
+      let x = movement.x;
+      let y = movement.y;
+      if (keys.has("a") || keys.has("arrowleft")) x -= 1;
+      if (keys.has("d") || keys.has("arrowright")) x += 1;
+      if (keys.has("w") || keys.has("arrowup")) y += 1;
+      if (keys.has("s") || keys.has("arrowdown")) y -= 1;
       const length = Math.hypot(x, y);
       if (length > 1) { x /= length; y /= length; }
       return { x, y };
     },
-    getCamera() {
-      return { yaw: state.cameraYaw, distance: state.cameraDistance };
-    },
-    reset() {
-      clearMovement();
-    }
+    getCamera() { return { yaw: state.cameraYaw, distance: state.cameraDistance }; },
+    reset() { clearMovement(); }
   };
 }
