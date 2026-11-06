@@ -30,8 +30,8 @@ export function createPlayerMovement({ THREE, player, city, input, speed = 5 }) 
     const directionX = moveX / magnitude;
     const directionZ = moveZ / magnitude;
     const distance = currentSpeed * frameDelta * Math.min(inputLength, 1);
-    const nextX = THREE.MathUtils.clamp(position.x + directionX * distance, -84, 84);
-    const nextZ = THREE.MathUtils.clamp(position.z + directionZ * distance, -84, 84);
+    const nextX = THREE.MathUtils.clamp(position.x + directionX * distance, -270, 270);
+    const nextZ = THREE.MathUtils.clamp(position.z + directionZ * distance, -270, 270);
     if (!city.isBlocked(nextX, position.z)) position.x = nextX;
     if (!city.isBlocked(position.x, nextZ)) position.z = nextZ;
 
