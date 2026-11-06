@@ -68,7 +68,7 @@ const input = createInputController({
   joystickKnob: $("#joystick-knob"),
   cameraButton: $("#camera-button")
 });
-const movement = createPlayerMovement({ THREE, player, city, input, speed: 5 });
+const movement = createPlayerMovement({ THREE, player, city, input, speed: 7.5 });
 const followCamera = createFollowCamera({ THREE, camera, player, input });
 
 const clock = new THREE.Clock();
@@ -148,7 +148,7 @@ settingsOverlay.addEventListener("click", (event) => {
 speedSlider.addEventListener("input", applyMovementSettings);
 sensitivitySlider.addEventListener("input", applyMovementSettings);
 settingsReset.addEventListener("click", () => {
-  speedSlider.value = "5";
+  speedSlider.value = "7.5";
   sensitivitySlider.value = "1";
   applyMovementSettings();
 });
