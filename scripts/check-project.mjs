@@ -32,11 +32,13 @@ const main = readFileSync(join(sourceRoot, "main.js"), "utf8");
 for (const match of main.matchAll(/\$\("#([a-z0-9-]+)"\)/g)) {
   assert.ok(html.includes('id="' + match[1] + '"'), "Missing HTML element #" + match[1]);
 }
-for (const direction of ["up", "down", "left", "right"]) {
-  assert.ok(html.includes('data-direction="' + direction + '"'), "Missing " + direction + " movement button");
-}
-assert.ok(css.includes("-webkit-tap-highlight-color: transparent"), "Mobile tap highlight suppression is missing");
-assert.ok(!/joystick/i.test(html + css + main), "Old joystick markup or wiring remains");
+assert.ok(html.includes('id="joystick-base"'), "Joystick base is missing");
+assert.ok(html.includes('id="joystick-knob"'), "Joystick knob is missing");
+assert.ok(css.includes(".joystick-base") && css.includes(".joystick-knob"), "Joystick styling is missing");
+assert.ok(css.includes("touch-action:none"), "Joystick touch input must prevent page gestures");
+assert.ok(css.includes("-webkit-tap-highlight-color:transparent"), "Mobile tap highlight suppression is missing");
+assert.ok(!html.includes("data-direction="), "Old directional buttons remain in the UI");
+assert.ok(main.includes('joystickBase: $("#joystick-base")'), "Joystick input is not connected in main");
 assert.ok(html.includes("src/main.js"), "Module entry point is missing");
 
-console.log("Project validation passed: " + jsFiles.length + " JavaScript modules checked, imports resolved, UI hooks verified.");
+console.log("Project validation passed: " + jsFiles.length + " JavaScript modules checked, imports resolved, joystick UI hooks verified.");
