@@ -14,8 +14,10 @@ export function createPlayerMovement({ THREE, player, city, input, speed = 5 }) 
     const cameraYaw = input.getCamera().yaw;
     const forwardX = Math.sin(cameraYaw);
     const forwardZ = Math.cos(cameraYaw);
-    const rightX = Math.cos(cameraYaw);
-    const rightZ = -Math.sin(cameraYaw);
+    // The follow camera sits behind the player and looks toward +Z at yaw 0.
+    // Its screen-right axis therefore points toward world -X (not +X).
+    const rightX = -Math.cos(cameraYaw);
+    const rightZ = Math.sin(cameraYaw);
     const moveX = rightX * intent.x + forwardX * intent.y;
     const moveZ = rightZ * intent.x + forwardZ * intent.y;
     const magnitude = Math.hypot(moveX, moveZ);
