@@ -10,6 +10,8 @@ import { createInputController } from "./controls/createInputController.js";
 import { createFireworks } from "./effects/createFireworks.js";
 import { createFestivalAudio } from "./effects/createFestivalAudio.js";
 import { createFestivalAtmosphere } from "./effects/createFestivalAtmosphere.js";
+import { createDistrictSystem } from "./world/createDistrictSystem.js";
+import { createMinimap } from "./ui/createMinimap.js";
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $("#world");
@@ -55,6 +57,8 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const city = createCity(scene);
+const districtSystem = createDistrictSystem();
+const minimap = createMinimap($("#minimap"), districtSystem.districts);
 const player = createCharacter(scene, {
   x: 0,
   z: 5,
@@ -86,6 +90,7 @@ let settingsOpen = false;
 let elapsed = 0;
 let lastFireAt = 0;
 let toastTimeout = 0;
+let lastMinimapUpdate = 0;
 
 function resize() {
   const width = window.innerWidth;
@@ -225,15 +230,21 @@ function animate() {
   if (hasEnteredCity && !paused && !settingsOpen) {
     if (driving) vehicleMovement.update(delta);
     else movement.update(delta, elapsed);
-    const x = player.root.position.x;
-    const z = player.root.position.z;
+    const x = driving ? car.root.position.x : player.root.position.x;
+    const z = driving ? car.root.position.z : player.root.position.z;
     const templeDistance = Math.hypot(x - 205, z - 65);
     const plazaDistance = Math.hypot(x + 205, z - 65);
-    if (templeDistance < 34) locationLabel.textContent = "Lakshmi–Ganesh Mandir";
-    else if (plazaDistance < 34) locationLabel.textContent = "Food & Social Plaza";
-    else locationLabel.textContent = Math.abs(z) < 54 ? "Main Street" : "Festival Lane";
+    const district = districtSystem.getCurrentDistrict(x, z);
+    if (templeDistance < 32) locationLabel.textContent = "Lakshmi–Ganesh Mandir";
+    else if (plazaDistance < 32) locationLabel.textContent = "Food & Social Plaza";
+    else locationLabel.textContent = district ? district.name : "Outer Ring Road";
   }
   if (hasEnteredCity) followCamera.update(delta, driving, car);
+  if (hasEnteredCity && elapsed - lastMinimapUpdate >= 0.1) {
+    const subject = driving ? car.root : player.root;
+    minimap.update(subject.position, subject.rotation.y);
+    lastMinimapUpdate = elapsed;
+  }
   renderer.render(scene, camera);
 }
 animate();
