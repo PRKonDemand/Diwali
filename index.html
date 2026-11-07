@@ -4054,7 +4054,7 @@ function updatePlayer(dt){
   playerRight.crossVectors(playerForward,playerWorldUp).normalize();
   playerDesired.copy(playerForward).multiplyScalar(y).addScaledVector(playerRight,x);
   if(playerDesired.lengthSq()>1)playerDesired.normalize();
-  const targetSpeed=(playerKeys.has("run")||playerRunHeld)?5.8:3.2;
+  const targetSpeed=(playerKeys.has("run")||playerRunHeld)?8.7:4.8;
   const rate=playerDesired.lengthSq()>0?14:18;
   const blend=1-Math.exp(-rate*dt);
   playerMove.lerp(playerDesired.multiplyScalar(targetSpeed),blend);
