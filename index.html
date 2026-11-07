@@ -4020,7 +4020,7 @@ for(const side of [-1,1]){
 for(const side of [-1,1])playerPart(playerRoot,playerSphere,playerDark,[side*.105,.035,-.035],[.105,.055,.17]);
 
 const playerKeys=new Set();let playerMode=true,playerJoy={x:0,y:0,active:false,id:-1},playerYaw=0,playerRunHeld=false,playerDrag=null;
-const playerForward=new D(),playerRight=new D(),playerMove=new D(),playerDesired=new D(),playerCameraTarget=new D(),playerCameraPosition=new D(),playerWorldUp=new D(0,1,0);
+const playerForward=new D(),playerRight=new D(),playerMove=new D(),playerDesired=new D(),playerCameraTarget=new D(),playerCameraPosition=new D(),playerWorldUp=new D(0,1,0);let playerCameraPitch=.52;
 const playerKeyMap={KeyW:"f",ArrowUp:"f",KeyS:"b",ArrowDown:"b",KeyA:"l",ArrowLeft:"l",KeyD:"r",ArrowRight:"r",ShiftLeft:"run",ShiftRight:"run"};
 function playerKeyDown(e){if(!playerMode)return;const action=playerKeyMap[e.code];if(!action)return;if(e.target instanceof HTMLElement&&(/INPUT|TEXTAREA|SELECT|BUTTON/.test(e.target.tagName)))return;e.preventDefault();playerKeys.add(action);}
 function playerKeyUp(e){const action=playerKeyMap[e.code];if(action)playerKeys.delete(action);}
@@ -4038,7 +4038,8 @@ function playerStickMove(e){if(!playerJoy.active||playerJoy.id!==e.pointerId)ret
 function playerStickEnd(e){if(playerJoy.id!==e.pointerId)return;e.preventDefault();playerJoy={x:0,y:0,active:false,id:-1};playerKnob.style.transform="translate(0px,0px)";try{playerStick.releasePointerCapture(e.pointerId);}catch{}}
 playerStick.addEventListener("pointerdown",playerStickDown,{passive:false});playerStick.addEventListener("pointermove",playerStickMove,{passive:false});playerStick.addEventListener("pointerup",playerStickEnd,{passive:false});playerStick.addEventListener("pointercancel",playerStickEnd,{passive:false});playerStick.addEventListener("lostpointercapture",playerStickEnd);
 playerRun.addEventListener("pointerdown",e=>{e.preventDefault();playerRunHeld=true;try{playerRun.setPointerCapture(e.pointerId);}catch{}});for(const name of ["pointerup","pointercancel","lostpointercapture"])playerRun.addEventListener(name,()=>playerRunHeld=false);window.addEventListener("pointerup",()=>playerRunHeld=false);window.addEventListener("pointercancel",()=>playerRunHeld=false);
-_n.domElement.addEventListener("pointerdown",e=>{if(!playerMode||e.pointerType==="touch")return;playerDrag={x:e.clientX,y:e.clientY,id:e.pointerId};});window.addEventListener("pointerup",e=>{if(playerDrag&&playerDrag.id===e.pointerId)playerDrag=null;});window.addEventListener("pointermove",e=>{if(!playerMode||!playerDrag||playerDrag.id!==e.pointerId)return;const dx=e.clientX-playerDrag.x;playerDrag.x=e.clientX;playerDrag.y=e.clientY;playerYaw-=dx*.004;});
+_n.domElement.style.touchAction="none";
+_n.domElement.addEventListener("pointerdown",e=>{if(!playerMode||playerDrag)return;playerDrag={x:e.clientX,y:e.clientY,id:e.pointerId};try{_n.domElement.setPointerCapture(e.pointerId);}catch{}});window.addEventListener("pointerup",e=>{if(playerDrag&&playerDrag.id===e.pointerId){playerDrag=null;}});window.addEventListener("pointercancel",e=>{if(playerDrag&&playerDrag.id===e.pointerId)playerDrag=null;});window.addEventListener("pointermove",e=>{if(!playerMode||!playerDrag||playerDrag.id!==e.pointerId)return;const dx=e.clientX-playerDrag.x,dy=e.clientY-playerDrag.y;playerDrag.x=e.clientX;playerDrag.y=e.clientY;playerYaw-=dx*.004;playerCameraPitch=Math.max(.12,Math.min(1.08,playerCameraPitch-dy*.0035));});
 function playerBlockedAt(x,z){
   if(!bt)return false;
   const radius=.42;
@@ -4069,7 +4070,7 @@ function updatePlayer(dt){
   }
   desiredTarget.set(playerRoot.position.x,1.25,playerRoot.position.z);
   playerCameraTarget.lerp(desiredTarget,1-Math.exp(-9*dt));
-  desiredCamera.set(playerRoot.position.x-Math.sin(playerYaw)*9,6.3,playerRoot.position.z+Math.cos(playerYaw)*9);
+  desiredCamera.set(playerRoot.position.x-Math.sin(playerYaw)*9*Math.cos(playerCameraPitch),1.25+9*Math.sin(playerCameraPitch),playerRoot.position.z+Math.cos(playerYaw)*9*Math.cos(playerCameraPitch));
   playerCameraPosition.copy(gn.position).lerp(desiredCamera,1-Math.exp(-5*dt));
   gn.position.copy(playerCameraPosition);kt.target.copy(playerCameraTarget);
 }
