@@ -4083,6 +4083,10 @@ function updatePlayer(dt){
   if(playerMove.lengthSq()>.0025){
     const targetYaw=Math.atan2(playerMove.x,-playerMove.z),diff=Math.atan2(Math.sin(targetYaw-playerRoot.rotation.y),Math.cos(targetYaw-playerRoot.rotation.y));
     playerRoot.rotation.y+=Math.sign(diff)*Math.min(Math.abs(diff),7.5*dt);
+    // Keep the third-person camera orbit attached to the character's heading.
+    // Manual swipe remains free; while moving, the camera eases behind the turn.
+    const cameraFollowDiff=Math.atan2(Math.sin(playerRoot.rotation.y-playerYaw),Math.cos(playerRoot.rotation.y-playerYaw));
+    playerYaw+=cameraFollowDiff*(1-Math.exp(-2.6*dt));
     let nextX=Math.max(-ke.half+4,Math.min(ke.half-4,playerRoot.position.x+playerMove.x*dt));
     let nextZ=Math.max(-ke.half+4,Math.min(ke.half-4,playerRoot.position.z+playerMove.z*dt));
     if(playerBlockedAt(nextX,playerRoot.position.z))nextX=playerRoot.position.x;
