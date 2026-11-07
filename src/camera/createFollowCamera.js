@@ -10,7 +10,8 @@ export function createFollowCamera({ THREE, camera, player, input }) {
 
     if (mode === "first") {
       // Put the view just behind the windscreen when driving, or at eye level on foot.
-      forward.set(Math.sin(yaw), 0, Math.cos(yaw));
+      const viewYaw = driving ? subject.rotation.y + yaw : yaw;
+      forward.set(Math.sin(viewYaw), 0, Math.cos(viewYaw));
       desiredPosition.set(
         subject.position.x + (driving ? forward.x * 0.55 : 0),
         subject.position.y + (driving ? 1.48 : 1.68),
@@ -20,7 +21,7 @@ export function createFollowCamera({ THREE, camera, player, input }) {
       target.y -= driving ? 0.12 : 0.08;
       camera.position.lerp(desiredPosition, smoothing);
       camera.lookAt(target);
-      player.root.visible = driving ? false : false;
+      player.root.visible = false;
       return;
     }
 
