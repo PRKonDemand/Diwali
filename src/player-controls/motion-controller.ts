@@ -1,4 +1,4 @@
-import { MathUtils, Vector3 } from 'three';
+import { Vector3 } from 'three';
 import type { PlayerControllerContext, PlayerMotionConfig, PlayerMotionSnapshot } from './types';
 import { DEFAULT_PLAYER_MOTION_CONFIG } from './types';
 import type { PlayerInputSystem } from './input-system';
@@ -15,6 +15,7 @@ export class ThirdPersonMotionController {
   private readonly right = new Vector3();
   private readonly desired = new Vector3();
   private readonly displacement = new Vector3();
+  private readonly targetVelocity = new Vector3();
   private readonly cameraDirection = new Vector3();
   private running = false;
 
@@ -47,10 +48,10 @@ export class ThirdPersonMotionController {
 
     this.running = frame.run && this.desired.lengthSq() > EPSILON;
     const targetSpeed = this.running ? this.config.runSpeed : this.config.walkSpeed;
-    const targetVelocity = this.desired.clone().multiplyScalar(targetSpeed);
-    const accelerating = targetVelocity.lengthSq() > EPSILON;
+    this.targetVelocity.copy(this.desired).multiplyScalar(targetSpeed);
+    const accelerating = this.targetVelocity.lengthSq() > EPSILON;
     const rate = accelerating ? this.config.acceleration : this.config.deceleration;
-    this.velocity.lerp(targetVelocity, 1 - Math.exp(-rate * dt));
+    this.velocity.lerp(this.targetVelocity, 1 - Math.exp(-rate * dt));
 
     if (accelerating && this.velocity.lengthSq() > EPSILON) {
       const targetYaw = Math.atan2(this.velocity.x, this.velocity.z);
