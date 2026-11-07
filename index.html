@@ -4028,7 +4028,7 @@ function clearPlayerInput(){playerKeys.clear();playerJoy={x:0,y:0,active:false,i
 window.addEventListener("keydown",playerKeyDown);window.addEventListener("keyup",playerKeyUp);window.addEventListener("blur",clearPlayerInput);document.addEventListener("visibilitychange",()=>{if(document.hidden)clearPlayerInput();});
 function playerSetMode(enabled){
   playerMode=enabled;playerHud.classList.toggle("active",enabled);playerModeButton.textContent=enabled?"Free camera":"Enter city";
-  kt.enabled=!enabled;clearPlayerInput();
+  kt.enabled=!enabled;playerDrag=null;clearPlayerInput();
   if(enabled){playerYaw=playerRoot.rotation.y;playerCameraTarget.set(playerRoot.position.x,1.35,playerRoot.position.z);playerCameraPosition.set(playerRoot.position.x-Math.sin(playerYaw)*9,6.5,playerRoot.position.z+Math.cos(playerYaw)*9);gn.position.copy(playerCameraPosition);kt.target.copy(playerCameraTarget);kt.update();}
   else {kt.target.set(playerRoot.position.x,0,playerRoot.position.z);gn.position.set(playerRoot.position.x+10,12,playerRoot.position.z+16);kt.update();}
 }
@@ -4038,12 +4038,35 @@ function playerStickMove(e){if(!playerJoy.active||playerJoy.id!==e.pointerId)ret
 function playerStickEnd(e){if(playerJoy.id!==e.pointerId)return;e.preventDefault();playerJoy={x:0,y:0,active:false,id:-1};playerKnob.style.transform="translate(0px,0px)";try{playerStick.releasePointerCapture(e.pointerId);}catch{}}
 playerStick.addEventListener("pointerdown",playerStickDown,{passive:false});playerStick.addEventListener("pointermove",playerStickMove,{passive:false});playerStick.addEventListener("pointerup",playerStickEnd,{passive:false});playerStick.addEventListener("pointercancel",playerStickEnd,{passive:false});playerStick.addEventListener("lostpointercapture",playerStickEnd);
 playerRun.addEventListener("pointerdown",e=>{e.preventDefault();playerRunHeld=true;try{playerRun.setPointerCapture(e.pointerId);}catch{}});for(const name of ["pointerup","pointercancel","lostpointercapture"])playerRun.addEventListener(name,()=>playerRunHeld=false);window.addEventListener("pointerup",()=>playerRunHeld=false);window.addEventListener("pointercancel",()=>playerRunHeld=false);
+// Navigation camera input is delegated at document level so transparent HUD layers
+// and mobile browser hit-testing cannot swallow right-side swipe starts.
 _n.domElement.style.touchAction="none";
 _n.domElement.style.pointerEvents="auto";
-_n.domElement.addEventListener("pointerdown",e=>{if(!playerMode||playerDrag||e.button!==0)return;e.preventDefault();playerDrag={x:e.clientX,y:e.clientY,id:e.pointerId};try{_n.domElement.setPointerCapture(e.pointerId);}catch{}},{passive:false});
-document.addEventListener("pointermove",e=>{if(!playerMode||!playerDrag||playerDrag.id!==e.pointerId)return;e.preventDefault();const dx=e.clientX-playerDrag.x,dy=e.clientY-playerDrag.y;playerDrag.x=e.clientX;playerDrag.y=e.clientY;playerYaw-=dx*.006;playerCameraPitch=Math.max(.16,Math.min(1.12,playerCameraPitch-dy*.005));},{capture:true,passive:false});
+document.documentElement.style.touchAction="none";
+document.body.style.touchAction="none";
+function isPlayerControlTarget(target){
+  return !!(target&&target.closest&&target.closest("#player-stick,#player-run,#player-mode,button,input,select,textarea,.panel"));
+}
+document.addEventListener("pointerdown",e=>{
+  if(!playerMode||playerDrag||e.button!==0||isPlayerControlTarget(e.target))return;
+  if(e.pointerType==="touch"&&e.clientX<window.innerWidth*.42)return;
+  if(e.pointerType!=="touch"&&e.target!==_n.domElement&&!_n.domElement.contains(e.target))return;
+  e.preventDefault();
+  playerDrag={x:e.clientX,y:e.clientY,id:e.pointerId};
+  try{if(e.target.setPointerCapture)e.target.setPointerCapture(e.pointerId);}catch{}
+},{capture:true,passive:false});
+document.addEventListener("pointermove",e=>{
+  if(!playerMode||!playerDrag||playerDrag.id!==e.pointerId)return;
+  e.preventDefault();
+  const dx=e.clientX-playerDrag.x,dy=e.clientY-playerDrag.y;
+  playerDrag.x=e.clientX;playerDrag.y=e.clientY;
+  playerYaw-=dx*.006;
+  playerCameraPitch=Math.max(.16,Math.min(1.12,playerCameraPitch-dy*.005));
+},{capture:true,passive:false});
 function endPlayerCameraDrag(e){if(playerDrag&&playerDrag.id===e.pointerId)playerDrag=null;}
-document.addEventListener("pointerup",endPlayerCameraDrag,true);document.addEventListener("pointercancel",endPlayerCameraDrag,true);_n.domElement.addEventListener("lostpointercapture",endPlayerCameraDrag);
+document.addEventListener("pointerup",endPlayerCameraDrag,true);
+document.addEventListener("pointercancel",endPlayerCameraDrag,true);
+document.addEventListener("lostpointercapture",endPlayerCameraDrag,true);
 function playerBlockedAt(x,z){
   if(!bt)return false;
   const radius=.42;
