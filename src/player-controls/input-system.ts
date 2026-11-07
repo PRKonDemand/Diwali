@@ -7,7 +7,6 @@ const ACTION_KEYS: Record<PlayerAction, string[]> = {
   MoveRight: ['KeyD', 'ArrowRight'],
   Run: ['ShiftLeft', 'ShiftRight'],
 };
-const MOVEMENT_ACTIONS: PlayerAction[] = ['MoveForward', 'MoveBackward', 'MoveLeft', 'MoveRight'];
 
 /** Centralized input collection. It knows actions, not player movement or UI layout. */
 export class PlayerInputSystem {
@@ -17,6 +16,7 @@ export class PlayerInputSystem {
   private readonly held = new Set<PlayerAction>();
   private joystick = { x: 0, y: 0, active: false, pointerId: -1 };
   private joystickElement?: HTMLElement;
+  private joystickCleanup?: () => void;
   private paused = false;
   private disposed = false;
 
@@ -48,8 +48,15 @@ export class PlayerInputSystem {
     return (Object.keys(ACTION_KEYS) as PlayerAction[]).find(action => ACTION_KEYS[action].includes(code));
   }
   private isTypingTarget(target: EventTarget | null): boolean {
-    if (!(target instanceof HTMLElement)) return false;
+    if (typeof HTMLElement === 'undefined' || !(target instanceof HTMLElement)) return false;
     return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName);
+  }
+
+  /** UI may bind a dedicated touch Run button without coupling it to movement code. */
+  setAction(action: PlayerAction, pressed: boolean): void {
+    if (this.paused || this.disposed) return;
+    if (pressed) this.held.add(action);
+    else this.held.delete(action);
   }
 
   /** Attach one joystick surface supplied by the UI layer. Its visuals remain UI-owned. */
@@ -60,10 +67,7 @@ export class PlayerInputSystem {
     const sensitivity = options.sensitivity ?? this.options.sensitivity;
     const previousTouchAction = element.style.touchAction;
     const previousOverscroll = element.style.overscrollBehavior;
-    element.style.touchAction = 'none';
-    element.style.overscrollBehavior = 'contain';
     this.joystickElement = element;
-
     const update = (event: PointerEvent) => {
       if (this.joystick.pointerId !== event.pointerId) return;
       event.preventDefault();
@@ -90,15 +94,18 @@ export class PlayerInputSystem {
       event.preventDefault();
       this.joystick.pointerId = event.pointerId;
       this.joystick.active = true;
-      try { element.setPointerCapture(event.pointerId); } catch { /* unsupported capture is handled by cancel/up */ }
+      try { element.setPointerCapture(event.pointerId); } catch { /* cancel/up still releases input */ }
       update(event);
     };
+    element.style.touchAction = 'none';
+    element.style.overscrollBehavior = 'contain';
     element.addEventListener('pointerdown', down, { passive: false });
     element.addEventListener('pointermove', update, { passive: false });
     element.addEventListener('pointerup', end, { passive: false });
     element.addEventListener('pointercancel', end, { passive: false });
     element.addEventListener('lostpointercapture', end as EventListener);
-    return () => {
+
+    const cleanup = () => {
       element.removeEventListener('pointerdown', down);
       element.removeEventListener('pointermove', update);
       element.removeEventListener('pointerup', end);
@@ -106,16 +113,25 @@ export class PlayerInputSystem {
       element.removeEventListener('lostpointercapture', end as EventListener);
       element.style.touchAction = previousTouchAction;
       element.style.overscrollBehavior = previousOverscroll;
-      if (this.joystickElement === element) this.detachJoystick();
+      if (this.joystickElement === element) {
+        this.joystickElement = undefined;
+        this.joystick = { x: 0, y: 0, active: false, pointerId: -1 };
+      }
+      if (this.joystickCleanup === cleanup) this.joystickCleanup = undefined;
     };
+    this.joystickCleanup = cleanup;
+    return cleanup;
   }
 
   private detachJoystick(): void {
-    this.joystick = { x: 0, y: 0, active: false, pointerId: -1 };
-    this.joystickElement = undefined;
+    if (this.joystickCleanup) this.joystickCleanup();
+    else {
+      this.joystick = { x: 0, y: 0, active: false, pointerId: -1 };
+      this.joystickElement = undefined;
+    }
   }
   getFrame(): PlayerInputFrame {
-    if (this.paused) return { moveX: 0, moveY: 0, run: false, active: false, source: 'none' };
+    if (this.paused || this.disposed) return { moveX: 0, moveY: 0, run: false, active: false, source: 'none' };
     let x = Number(this.held.has('MoveRight')) - Number(this.held.has('MoveLeft'));
     let y = Number(this.held.has('MoveForward')) - Number(this.held.has('MoveBackward'));
     const keyboardActive = x !== 0 || y !== 0;
@@ -135,11 +151,10 @@ export class PlayerInputSystem {
   reset(): void { this.held.clear(); this.joystick = { x: 0, y: 0, active: false, pointerId: -1 }; }
   dispose(): void {
     if (this.disposed) return;
-    this.disposed = true; this.reset();
+    this.disposed = true; this.reset(); this.detachJoystick();
     this.target.removeEventListener('keydown', this.onKeyDown);
     this.target.removeEventListener('keyup', this.onKeyUp);
     this.target.removeEventListener('blur', this.onBlur);
     this.documentTarget?.removeEventListener('visibilitychange', this.onVisibility);
-    this.detachJoystick();
   }
 }
