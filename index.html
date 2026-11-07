@@ -3969,16 +3969,56 @@ void main() {
 // DIWALI_PLAYER_RUNTIME
 const playerHud=document.getElementById("player-hud"),playerStick=document.getElementById("player-stick"),playerKnob=document.getElementById("player-knob"),playerRun=document.getElementById("player-run"),playerModeButton=document.getElementById("player-mode");
 const playerRoot=new ft();playerRoot.name="DiwaliPlayer";playerRoot.position.set(0,0,0);Ci.add(playerRoot);
-function playerBox(w,h,d,color,y){
-  const x=w/2,z=d/2,b=0,a=h;
-  const vertices=[-x,b,-z,x,b,-z,x,a,-z,-x,a,-z,-x,b,z,x,b,z,x,a,z,-x,a,z];
-  const indices=[0,2,1,0,3,2,4,5,6,4,6,7,0,1,5,0,5,4,3,7,6,3,6,2,1,2,6,1,6,5,0,4,7,0,7,3];
-  const geometry=new ht();geometry.setAttribute("position",new Ke(vertices,3));geometry.setIndex(indices);geometry.computeVertexNormals();
-  const mesh=new Tt(geometry,new Vn({color,roughness:.82}));mesh.position.y=y;return mesh;
+function playerPart(parent,geometry,material,position,scale,rotation){
+  const mesh=new Tt(geometry,material);mesh.position.set(...position);mesh.scale.set(...scale);
+  if(rotation)mesh.rotation.set(...rotation);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
 }
-playerRoot.add(playerBox(.62,1.08,.34,0xffb35c,0));
-playerRoot.add(playerBox(.38,.38,.38,0xf2c69b,1.12));
-playerRoot.add(playerBox(.12,.58,.14,0x26354a,.24));
+const playerSphere=new Ys(1,24,16);
+const playerSkin=new Vn({color:0xb97850,roughness:.9});
+const playerCloth=new Vn({color:0xf0a13a,roughness:.82});
+const playerTrim=new Vn({color:0x7c2638,roughness:.78});
+const playerDark=new Vn({color:0x253044,roughness:.9});
+const playerHair=new Vn({color:0x211a18,roughness:1});
+const playerEye=new Vn({color:0x171311,roughness:.45});
+const playerWhite=new Vn({color:0xf5eee2,roughness:.5});
+const playerGold=new Vn({color:0xe8b94f,metalness:.55,roughness:.35});
+const playerHead=new ft();playerHead.position.y=1.55;playerRoot.add(playerHead);
+// Layered kurta, waist sash and tapered lower-body silhouette.
+playerPart(playerRoot,playerSphere,playerCloth,[0,.91,0],[.255,.43,.16]);
+playerPart(playerRoot,playerSphere,playerTrim,[0,.61,0],[.245,.09,.165]);
+playerPart(playerRoot,playerSphere,playerDark,[-.105,.27,0],[.105,.3,.13]);
+playerPart(playerRoot,playerSphere,playerDark,[.105,.27,0],[.105,.3,.13]);
+// Neck and shaped head.
+playerPart(playerRoot,playerSphere,playerSkin,[0,1.31,0],[.085,.12,.085]);
+playerPart(playerHead,playerSphere,playerSkin,[0,0,0],[.165,.215,.155]);
+playerPart(playerHead,playerSphere,playerHair,[0,.135,.015],[.17,.095,.16]);
+playerPart(playerHead,playerSphere,playerHair,[0,.065,.12],[.145,.11,.045]);
+// Ears, eyes, brows, nose and a subtle smile; face points toward local -Z.
+for(const side of [-1,1]){
+  playerPart(playerHead,playerSphere,playerSkin,[side*.166,-.005,0],[.035,.065,.045]);
+  playerPart(playerHead,playerSphere,playerWhite,[side*.061,.025,-.142],[.034,.024,.012]);
+  playerPart(playerHead,playerSphere,playerEye,[side*.061,.025,-.153],[.014,.018,.008]);
+  playerPart(playerHead,playerSphere,playerHair,[side*.061,.065,-.139],[.043,.012,.012]);
+}
+playerPart(playerHead,playerSphere,playerSkin,[0,-.035,-.16],[.026,.045,.027]);
+playerPart(playerHead,playerSphere,playerTrim,[0,-.105,-.143],[.045,.009,.009]);
+// Two articulated-looking sleeves, forearms, palms and individual fingers.
+for(const side of [-1,1]){
+  const arm=new ft();arm.position.set(side*.245,1.12,0);arm.rotation.z=side*-.12;playerRoot.add(arm);
+  playerPart(arm,playerSphere,playerCloth,[side*.015,-.13,0],[.095,.205,.105],[0,0,side*-.08]);
+  playerPart(arm,playerSphere,playerSkin,[side*.035,-.355,-.005],[.067,.17,.072],[0,0,side*-.1]);
+  playerPart(arm,playerSphere,playerGold,[side*.04,-.465,0],[.071,.018,.075]);
+  playerPart(arm,playerSphere,playerSkin,[side*.045,-.535,-.005],[.07,.085,.045]);
+  for(let finger=0;finger<4;finger++){
+    const fx=side*.045+(finger-1.5)*.032;
+    playerPart(arm,playerSphere,playerSkin,[fx,-.605,-.012],[.014,.052,.017],[0,0,(finger-1.5)*-.08]);
+  }
+  playerPart(arm,playerSphere,playerSkin,[side*.105,-.54,-.012],[.018,.052,.018],[0,0,side*-.65]);
+  playerPart(arm,playerSphere,playerGold,[side*.045,-.67,0],[.052,.012,.052]);
+}
+// Simple footwear.
+for(const side of [-1,1])playerPart(playerRoot,playerSphere,playerDark,[side*.105,.035,-.035],[.105,.055,.17]);
+
 const playerKeys=new Set();let playerMode=true,playerJoy={x:0,y:0,active:false,id:-1},playerYaw=0,playerRunHeld=false,playerDrag=null;
 const playerForward=new D(),playerRight=new D(),playerMove=new D(),playerDesired=new D(),playerCameraTarget=new D(),playerCameraPosition=new D(),playerWorldUp=new D(0,1,0);
 const playerKeyMap={KeyW:"f",ArrowUp:"f",KeyS:"b",ArrowDown:"b",KeyA:"l",ArrowLeft:"l",KeyD:"r",ArrowRight:"r",ShiftLeft:"run",ShiftRight:"run"};
