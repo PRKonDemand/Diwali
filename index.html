@@ -3,54 +3,250 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10131b">
-  <meta name="description" content="A clean, fast calculator for everyday arithmetic.">
-  <title>Calculator</title>
+  <meta name="theme-color" content="#eeeae1">
+  <meta name="description" content="A straightforward calculator for everyday arithmetic.">
+  <title>Calc — Everyday arithmetic</title>
   <style>
-    :root{color-scheme:dark;--bg:#0d1017;--panel:#171c27;--screen:#111620;--key:#252c3a;--key-hover:#323b4d;--muted:#8d98aa;--text:#f5f7fb;--accent:#8da7ff;--accent-ink:#11182c;--danger:#ff8585}
-    *{box-sizing:border-box}
-    body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#202b45 0%,transparent 48%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
-    .calculator{width:min(100%,390px);padding:20px;border:1px solid #ffffff12;border-radius:28px;background:linear-gradient(160deg,#1b2230,#141923 68%);box-shadow:0 28px 90px #0008}
-    .top{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 18px}
-    .brand{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#c5cee0}
-    .status{font-size:11px;color:var(--muted)}
-    .display{min-height:136px;padding:18px 14px 16px;margin-bottom:16px;border-radius:18px;background:var(--screen);display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;overflow:hidden}
-    .previous{width:100%;min-height:22px;text-align:right;color:var(--muted);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .current{width:100%;text-align:right;font-size:clamp(36px,10vw,52px);font-weight:550;letter-spacing:-.055em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
-    .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-    button{min-width:0;height:68px;border:0;border-radius:17px;background:var(--key);color:var(--text);font:600 21px/1 inherit;cursor:pointer;touch-action:manipulation;transition:background .15s,transform .08s,filter .15s; -webkit-tap-highlight-color:transparent}
-    button:hover{background:var(--key-hover)}
-    button:active{transform:scale(.96);filter:brightness(1.18)}
-    button:focus-visible{outline:3px solid #a9bbff;outline-offset:2px}
-    .utility{color:#c3ccdc;background:#303849;font-size:18px}
-    .operator{color:var(--accent);font-size:25px;background:#252f43}
-    .equals{background:var(--accent);color:var(--accent-ink);font-size:26px}
-    .equals:hover{background:#a4b7ff}
-    .zero{grid-column:span 2;text-align:left;padding-left:27px}
-    .hint{margin:16px 2px 0;text-align:center;font-size:11px;color:#778398}
-    @media(max-width:420px){body{padding:14px}.calculator{padding:16px;border-radius:24px}button{height:clamp(58px,15vw,68px);border-radius:15px}.keys{gap:8px}}
-    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+    :root {
+      color-scheme: light;
+      --paper: #eeeae1;
+      --surface: #f8f6f0;
+      --ink: #25241f;
+      --muted: #77746c;
+      --line: #d4cfc4;
+      --accent: #c94b2d;
+      --key-hover: #e7e2d8;
+    }
+    * { box-sizing: border-box; }
+    html { min-width: 280px; background: var(--paper); }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      width: min(100% - 64px, 1080px);
+      min-height: 100svh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+    .masthead {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .wordmark { display: flex; align-items: center; gap: 11px; }
+    .mark {
+      width: 25px; height: 25px;
+      display: grid; place-items: center;
+      border: 1px solid var(--ink);
+      font-family: Georgia, serif;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    .edition { color: var(--muted); font-weight: 500; }
+    .main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 430px);
+      align-items: center;
+      gap: clamp(48px, 9vw, 130px);
+      padding: 72px 4.5% 84px;
+    }
+    .intro { align-self: center; padding-bottom: 20px; }
+    .eyebrow {
+      margin: 0 0 24px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 510px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(48px, 6.4vw, 82px);
+      font-weight: 400;
+      line-height: .98;
+      letter-spacing: -.065em;
+    }
+    .intro-copy {
+      max-width: 310px;
+      margin: 27px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .rule-note {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 54px;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .rule-note::before { content: ""; width: 34px; height: 1px; background: var(--accent); }
+    .calculator { width: 100%; }
+    .calc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 0 12px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .calc-top span:last-child { color: var(--muted); font-weight: 500; }
+    .display {
+      min-height: 148px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      padding: 22px 2px 20px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      font-variant-numeric: tabular-nums;
+    }
+    .previous {
+      min-height: 22px;
+      width: 100%;
+      overflow: hidden;
+      color: var(--muted);
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+    }
+    .current {
+      width: 100%;
+      overflow: hidden;
+      color: var(--ink);
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: "Courier New", monospace;
+      font-size: clamp(39px, 6vw, 58px);
+      line-height: 1.2;
+      letter-spacing: -.075em;
+    }
+    .keys {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-left: 1px solid var(--line);
+      border-top: 1px solid var(--line);
+    }
+    button {
+      height: 70px;
+      min-width: 0;
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+      color: var(--ink);
+      font: 400 19px/1 Arial, Helvetica, sans-serif;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color .12s ease, color .12s ease;
+    }
+    button:hover { background: var(--key-hover); }
+    button:active { background: #dcd5c9; }
+    button:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--accent); outline-offset: -4px; }
+    .utility { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .operator { color: var(--accent); font-size: 23px; }
+    .equals { background: var(--accent); color: #fffaf3; }
+    .equals:hover { background: #ad3e25; }
+    .zero { grid-column: span 2; text-align: left; padding-left: 25px; }
+    .footer {
+      min-height: 54px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    @media (max-width: 720px) {
+      .page { width: min(100% - 36px, 480px); }
+      .masthead { min-height: 62px; }
+      .main {
+        grid-template-columns: 1fr;
+        gap: 36px;
+        padding: 42px 0 48px;
+        align-content: center;
+      }
+      .intro { padding: 0; }
+      .eyebrow { margin-bottom: 14px; }
+      h1 { max-width: 420px; font-size: clamp(43px, 12vw, 64px); }
+      .intro-copy { margin-top: 14px; font-size: 13px; }
+      .rule-note { display: none; }
+      .display { min-height: 116px; }
+      button { height: clamp(58px, 14vw, 68px); }
+      .footer { min-height: 48px; font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
-  <main class="calculator" aria-label="Calculator">
-    <header class="top"><div class="brand">Calculator</div><div class="status">STANDARD</div></header>
-    <section class="display" aria-live="polite" aria-atomic="true">
-      <div class="previous" id="previous"></div>
-      <div class="current" id="current">0</div>
-    </section>
-    <section class="keys" aria-label="Calculator keys">
-      <button class="utility" data-action="clear" aria-label="Clear">AC</button>
-      <button class="utility" data-action="sign" aria-label="Change sign">+/−</button>
-      <button class="utility" data-action="percent" aria-label="Percent">%</button>
-      <button class="operator" data-op="÷" aria-label="Divide">÷</button>
-      <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button><button class="operator" data-op="×" aria-label="Multiply">×</button>
-      <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="−" aria-label="Subtract">−</button>
-      <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="+" aria-label="Add">+</button>
-      <button class="zero" data-digit="0">0</button><button data-action="decimal" aria-label="Decimal point">.</button><button class="equals" data-action="equals" aria-label="Equals">=</button>
-    </section>
-    <p class="hint">Use your keyboard · Esc to clear · Enter to calculate</p>
-  </main>
+  <div class="page">
+    <header class="masthead">
+      <div class="wordmark"><span class="mark" aria-hidden="true">c</span><span>Calc / Everyday</span></div>
+      <div class="edition">A small useful tool&nbsp; · &nbsp;No. 01</div>
+    </header>
+
+    <main class="main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">A straightforward calculator</p>
+        <h1 id="page-title">Arithmetic,<br>without the noise.</h1>
+        <p class="intro-copy">For quick sums, everyday decisions and the numbers in between. Nothing extra to get in the way.</p>
+        <div class="rule-note">Four operations. One clear answer.</div>
+      </section>
+
+      <section class="calculator" aria-label="Calculator">
+        <div class="calc-top"><span>Calculator</span><span>Standard mode</span></div>
+        <div class="display" aria-live="polite" aria-atomic="true">
+          <div class="previous" id="previous"></div>
+          <div class="current" id="current">0</div>
+        </div>
+        <div class="keys" aria-label="Calculator keys">
+          <button class="utility" data-action="clear" aria-label="Clear">AC</button>
+          <button class="utility" data-action="sign" aria-label="Change sign">+/−</button>
+          <button class="utility" data-action="percent" aria-label="Percent">%</button>
+          <button class="operator" data-op="÷" aria-label="Divide">÷</button>
+          <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button><button class="operator" data-op="×" aria-label="Multiply">×</button>
+          <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="−" aria-label="Subtract">−</button>
+          <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="+" aria-label="Add">+</button>
+          <button class="zero" data-digit="0">0</button><button data-action="decimal" aria-label="Decimal point">.</button><button class="equals" data-action="equals" aria-label="Equals">=</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>Made to do one thing well.</span><span>Keyboard ready · Mobile friendly</span></footer>
+  </div>
+
   <script>
     (() => {
       const currentEl = document.getElementById('current');
@@ -63,8 +259,7 @@
 
       const pretty = value => {
         if (!Number.isFinite(value)) return 'Error';
-        const rounded = Number.parseFloat(value.toPrecision(11));
-        return String(rounded);
+        return String(Number.parseFloat(value.toPrecision(11)));
       };
       const render = () => { currentEl.textContent = display; };
       const inputDigit = digit => {
@@ -77,24 +272,23 @@
         }
         render();
       };
-      const calculate = (a,b,op) => {
-        switch(op) {
-          case '+': return a+b;
-          case '−': return a-b;
-          case '×': return a*b;
-          case '÷': return b === 0 ? NaN : a/b;
+      const calculate = (a, b, op) => {
+        switch (op) {
+          case '+': return a + b;
+          case '−': return a - b;
+          case '×': return a * b;
+          case '÷': return b === 0 ? NaN : a / b;
           default: return b;
         }
       };
       const chooseOperator = next => {
-        const value = Number(display);
         if (display === 'Error') return;
+        const value = Number(display);
         if (operator && !waiting) {
-          const result = calculate(stored,value,operator);
-          display = pretty(result);
-          stored = result;
+          stored = calculate(stored, value, operator);
+          display = pretty(stored);
           render();
-        } else stored = value;
+        } else if (stored === null || !operator) stored = value;
         operator = next;
         waiting = true;
         justCalculated = false;
@@ -103,26 +297,36 @@
       const equals = () => {
         if (!operator || stored === null || waiting || display === 'Error') return;
         const a = stored, b = Number(display), op = operator;
-        const result = calculate(a,b,op);
+        display = pretty(calculate(a, b, op));
         previousEl.textContent = pretty(a) + ' ' + op + ' ' + pretty(b) + ' =';
-        display = pretty(result);
-        stored = null; operator = null; waiting = true; justCalculated = true;
+        stored = null;
+        operator = null;
+        waiting = true;
+        justCalculated = true;
         render();
       };
       const clear = () => {
-        display='0'; stored=null; operator=null; waiting=false; justCalculated=false;
-        previousEl.textContent=''; render();
+        display = '0'; stored = null; operator = null;
+        waiting = false; justCalculated = false;
+        previousEl.textContent = '';
+        render();
       };
       const act = action => {
         if (action === 'clear') return clear();
         if (display === 'Error') return clear();
         if (action === 'decimal') {
-          if (waiting || justCalculated) { display='0.'; waiting=false; justCalculated=false; }
-          else if (!display.includes('.')) display += '.';
+          if (waiting || justCalculated) {
+            display = '0.'; waiting = false; justCalculated = false;
+          } else if (!display.includes('.')) display += '.';
         }
-        if (action === 'sign' && Number(display) !== 0) display = display.startsWith('-') ? display.slice(1) : '-' + display;
-        if (action === 'percent') display = pretty(Number(display)/100);
-        if (action === 'backspace' && !waiting && !justCalculated) display = display.length > 1 ? display.slice(0,-1) : '0';
+        if (action === 'sign' && Number(display) !== 0) {
+          display = display.startsWith('-') ? display.slice(1) : '-' + display;
+        }
+        if (action === 'percent') display = pretty(Number(display) / 100);
+        if (action === 'backspace' && !waiting && !justCalculated) {
+          display = display.length > 1 ? display.slice(0, -1) : '0';
+          if (display === '-') display = '0';
+        }
         render();
       };
 
@@ -136,12 +340,12 @@
       });
       document.addEventListener('keydown', event => {
         if (/^[0-9]$/.test(event.key)) { inputDigit(event.key); return; }
-        const ops = {'+':'+','-':'−','*':'×','/':'÷'};
+        const ops = {'+': '+', '-': '−', '*': '×', '/': '÷'};
         if (ops[event.key]) { event.preventDefault(); chooseOperator(ops[event.key]); return; }
         if (event.key === 'Enter' || event.key === '=') { event.preventDefault(); equals(); return; }
         if (event.key === '.') { act('decimal'); return; }
         if (event.key === 'Escape') { clear(); return; }
-        if (event.key === 'Backspace') { event.preventDefault(); act('backspace'); }
+        if (event.key === 'Backspace') { event.preventDefault(); act('backspace'); return; }
         if (event.key === '%') act('percent');
       });
       render();
