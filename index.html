@@ -4019,7 +4019,7 @@ function updatePlayer(dt){
   }
   desiredTarget.set(playerRoot.position.x,1.25,playerRoot.position.z);
   playerCameraTarget.lerp(desiredTarget,1-Math.exp(-9*dt));
-  const desiredCamera.set(playerRoot.position.x-Math.sin(playerYaw)*9,6.3,playerRoot.position.z+Math.cos(playerYaw)*9);
+  desiredCamera.set(playerRoot.position.x-Math.sin(playerYaw)*9,6.3,playerRoot.position.z+Math.cos(playerYaw)*9);
   playerCameraPosition.copy(gn.position).lerp(desiredCamera,1-Math.exp(-5*dt));
   gn.position.copy(playerCameraPosition);kt.target.copy(playerCameraTarget);
 }
