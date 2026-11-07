@@ -4017,7 +4017,7 @@ function updatePlayer(dt){
     const nextZ=Math.max(-ke.half+4,Math.min(ke.half-4,playerRoot.position.z+playerMove.z*dt));
     playerRoot.position.set(nextX,0,nextZ);
   }
-  const desiredTarget.set(playerRoot.position.x,1.25,playerRoot.position.z);
+  desiredTarget.set(playerRoot.position.x,1.25,playerRoot.position.z);
   playerCameraTarget.lerp(desiredTarget,1-Math.exp(-9*dt));
   const desiredCamera.set(playerRoot.position.x-Math.sin(playerYaw)*9,6.3,playerRoot.position.z+Math.cos(playerYaw)*9);
   playerCameraPosition.copy(gn.position).lerp(desiredCamera,1-Math.exp(-5*dt));
