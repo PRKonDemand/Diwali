@@ -25,6 +25,7 @@ const world: PedestrianWorldAdapter = {
 };
 
 const pedestrians = new PedestrianSystem(scene, world, { spawnCount: 180, maxAgents: 420 });
+// For low-end mobile, pass MOBILE_PEDESTRIAN_CONFIG as the third argument.
 pedestrians.spawnPopulation();
 
 // In the existing animation loop:
@@ -49,7 +50,7 @@ The overlay draws navigation routes, state-coloured pedestrian markers, building
 - Static buildings and props use a 24 m obstacle hash instead of a full scan per NPC.
 - Near agents update every frame; mid/far agents use staggered lower update rates; distant agents are culled.
 - Near characters share procedural geometry/materials; far silhouettes are batched with `InstancedMesh`.
-- Default cap: 420 agents. For low-end mobile, start with 80–140 agents and increase only after profiling.
+- Default cap: 420 agents. `MOBILE_PEDESTRIAN_CONFIG` starts at 120 max / 80 spawned with slower mid/far updates; profile on target devices before raising it.
 
 ## Validation
 
