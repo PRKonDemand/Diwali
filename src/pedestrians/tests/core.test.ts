@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { AgentSpatialHash, ObstacleSpatialHash } from '../avoidance';
 import { SeededRandom } from '../behaviour';
 import { PedestrianNavigator } from '../navigation';
 import { PedestrianStateMachine } from '../state-machine';
@@ -34,5 +35,26 @@ describe('Deterministic variation', () => {
     const a = new SeededRandom(77), b = new SeededRandom(77), c = new SeededRandom(78);
     expect([a.next(), a.next(), a.next()]).toEqual([b.next(), b.next(), b.next()]);
     expect(new SeededRandom(77).next()).not.toBe(c.next());
+  });
+});
+
+describe('Crowd and obstacle broad phase', () => {
+  it('keeps nearby queries bounded in a 500-agent crowd', () => {
+    const crowd = Array.from({ length: 500 }, (_, i) => ({
+      id: String(i), position: { x: i % 25, z: Math.floor(i / 25) }, lod: 'near',
+    } as PedestrianAgent));
+    const hash = new AgentSpatialHash(6);
+    hash.rebuild(crowd);
+    const nearby = hash.query({ x: 0, z: 0 }, 3);
+    expect(nearby.length).toBeGreaterThan(0);
+    expect(nearby.length).toBeLessThan(500);
+  });
+  it('returns only static obstacle candidates in the queried area', () => {
+    const hash = new ObstacleSpatialHash(24, [
+      { id: 'near', kind: 'building', minX: 10, maxX: 20, minZ: 10, maxZ: 20 },
+      { id: 'far', kind: 'building', minX: 500, maxX: 520, minZ: 500, maxZ: 520 },
+    ]);
+    expect(hash.query({ x: 12, z: 12 }, 2).map(item => item.id)).toContain('near');
+    expect(hash.query({ x: 12, z: 12 }, 2).map(item => item.id)).not.toContain('far');
   });
 });
