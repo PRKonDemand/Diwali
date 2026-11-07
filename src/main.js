@@ -12,6 +12,7 @@ import { createFestivalAudio } from "./effects/createFestivalAudio.js";
 import { createFestivalAtmosphere } from "./effects/createFestivalAtmosphere.js";
 import { createDistrictSystem } from "./world/createDistrictSystem.js";
 import { createMinimap } from "./ui/createMinimap.js";
+import { createDistrictGates } from "./world/createDistrictGates.js";
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $("#world");
@@ -57,6 +58,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const city = createCity(scene);
+createDistrictGates(scene);
 const districtSystem = createDistrictSystem();
 const minimap = createMinimap($("#minimap"), districtSystem.districts);
 const player = createCharacter(scene, {
