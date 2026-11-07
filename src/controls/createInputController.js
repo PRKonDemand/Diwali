@@ -1,13 +1,26 @@
 export function createInputController({ canvas, joystickBase, joystickKnob, cameraButton }) {
   const keys = new Set();
-  const state = { cameraYaw: 0, cameraDistance: 8.5, sensitivity: 1 };
+  const state = { cameraYaw: 0, cameraDistance: 8.5, cameraMode: "third", sensitivity: 1, cameraPreset: 1 };
   const movement = { x: 0, y: 0 };
   let joystickPointer = null;
   let cameraPointer = null;
   let lastPointerX = 0;
-  const cameraDistances = [8.5, 11.5, 15];
+  const cameraPresets = [
+    { mode: "first", distance: 0, label: "First-person camera" },
+    { mode: "third", distance: 8.5, label: "Third-person close camera" },
+    { mode: "third", distance: 11.5, label: "Third-person medium camera" },
+    { mode: "third", distance: 15, label: "Third-person wide camera" }
+  ];
   const maxTravel = 39;
   const deadZone = 0.1;
+
+  function applyCameraPreset() {
+    const preset = cameraPresets[state.cameraPreset];
+    state.cameraMode = preset.mode;
+    state.cameraDistance = preset.distance;
+    cameraButton.setAttribute("aria-label", preset.label);
+    cameraButton.title = preset.label;
+  }
 
   function resetJoystick() {
     joystickPointer = null;
@@ -102,9 +115,10 @@ export function createInputController({ canvas, joystickBase, joystickKnob, came
   canvas.addEventListener("lostpointercapture", () => { cameraPointer = null; });
 
   cameraButton.addEventListener("click", () => {
-    const current = cameraDistances.indexOf(state.cameraDistance);
-    state.cameraDistance = cameraDistances[(current + 1) % cameraDistances.length];
+    state.cameraPreset = (state.cameraPreset + 1) % cameraPresets.length;
+    applyCameraPreset();
   });
+  applyCameraPreset();
 
   return {
     getMovement() {
@@ -118,7 +132,7 @@ export function createInputController({ canvas, joystickBase, joystickKnob, came
       if (length > 1) { x /= length; y /= length; }
       return { x, y };
     },
-    getCamera() { return { yaw: state.cameraYaw, distance: state.cameraDistance }; },
+    getCamera() { return { yaw: state.cameraYaw, distance: state.cameraDistance, mode: state.cameraMode }; },
     setSensitivity(value) {
       state.sensitivity = Math.min(2, Math.max(0.5, Number(value) || 1));
     },
