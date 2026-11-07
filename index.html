@@ -4053,8 +4053,9 @@ _n.domElement.addEventListener("pointermove",e=>{
   e.preventDefault();
   const dx=e.clientX-playerDrag.x,dy=e.clientY-playerDrag.y;
   playerDrag.x=e.clientX;playerDrag.y=e.clientY;
-  playerYaw-=dx*.006;
-  playerCameraPitch=Math.max(.16,Math.min(1.12,playerCameraPitch-dy*.005));
+  // FPS/TPS look convention: drag right turns view right; drag upward looks upward.
+  playerYaw+=dx*.006;
+  playerCameraPitch=Math.max(.12,Math.min(1.05,playerCameraPitch+dy*.005));
 },{passive:false});
 function endPlayerCameraDrag(e){if(playerDrag&&playerDrag.id===e.pointerId)playerDrag=null;}
 _n.domElement.addEventListener("pointerup",endPlayerCameraDrag);
