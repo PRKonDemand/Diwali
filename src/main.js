@@ -233,7 +233,7 @@ function animate() {
     else if (plazaDistance < 34) locationLabel.textContent = "Food & Social Plaza";
     else locationLabel.textContent = Math.abs(z) < 54 ? "Main Street" : "Festival Lane";
   }
-  if (hasEnteredCity) followCamera.update(delta);
+  if (hasEnteredCity) followCamera.update(delta, driving, car);
   renderer.render(scene, camera);
 }
 animate();
