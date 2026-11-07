@@ -94,7 +94,7 @@
       #player-run { position:fixed; right:24px; bottom:28px; width:76px; height:76px; border-radius:50%; font-weight:700; pointer-events:auto; display:none; touch-action:none; }\n      #player-face-controls { position:fixed; right:18px; bottom:118px; display:none; gap:8px; pointer-events:auto; }\n      #player-face-controls button { width:48px; height:42px; border-radius:12px; background:rgba(10,12,18,.72); color:#ffe0b4; border:1px solid rgba(255,220,170,.5); touch-action:none; font-size:20px; }
       #player-hint { position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:9; pointer-events:none; padding:7px 12px; border-radius:9px; background:rgba(10,12,18,.72); color:#d9c9b2; font-size:11px; white-space:nowrap; }
       @media (pointer:coarse), (max-width:760px) {
-        #player-stick,#player-run,#player-face-controls { display:flex; }
+        #player-stick,#player-run { display:block; }\n        #player-face-controls { display:flex; }
         #player-mode { top:14px; right:14px; bottom:auto; }
         #player-hint { bottom:184px; }
         #left { max-height:34vh; }
@@ -4043,7 +4043,7 @@ playerRun.addEventListener("pointerdown",e=>{e.preventDefault();playerRunHeld=tr
 _n.domElement.style.touchAction="none";
 _n.domElement.style.pointerEvents="auto";
 _n.domElement.addEventListener("pointerdown",e=>{
-  if(!playerMode||playerDrag||!e.isPrimary||e.button!==0)return;
+  if(!playerMode||playerDrag||e.button!==0)return;
   e.preventDefault();
   playerDrag={x:e.clientX,y:e.clientY,id:e.pointerId};
   try{_n.domElement.setPointerCapture(e.pointerId);}catch{}
