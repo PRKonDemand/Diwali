@@ -67,13 +67,46 @@ body.dark{color-scheme:dark;--page:#202229;--shell:#22252d;--pad:#272a33;--key:#
  .keypad{padding-top:10px;padding-bottom:calc(env(safe-area-inset-bottom) + 12px);gap:6px}
  .keyrow{gap:7px}
 }
+/* Correct full-height portrait phone layout */
+@media (max-width:600px) and (orientation:portrait){
+ html,body{height:100%;min-height:0}
+ body{display:block}
+ .app{
+  width:100%;height:100dvh;height:100svh;min-height:0;max-height:none;
+  margin:0;border-radius:0;box-shadow:none;
+  grid-template-rows:minmax(0,34%) minmax(0,66%);
+ }
+ .top{padding:calc(env(safe-area-inset-top) + 12px) 25px 14px}
+ .theme-switch{margin-top:0;align-self:flex-start}
+ .theme-switch button{width:36px;height:30px}
+ .readout{margin-top:auto;padding:0 0 8px}
+ .expression{font-size:clamp(14px,4vw,17px)}
+ .result{font-size:clamp(48px,14vw,66px);line-height:1.05}
+ .keypad-wrap{height:100%;min-height:0}
+ .keypad{
+  height:100%;min-height:0;grid-template-rows:repeat(5,minmax(0,1fr));
+  padding:14px 16px calc(env(safe-area-inset-bottom) + 16px);
+  gap:9px;border-radius:26px 26px 0 0;
+ }
+ .keyrow{min-height:0;gap:9px}
+ .key{height:100%;min-height:0;border-radius:18px;font-size:clamp(21px,6vw,26px)}
+ .key.utility{font-size:clamp(16px,4.5vw,19px)}
+ .key.operator,.key.equals{font-size:27px}
+ .key svg{width:22px;height:22px}
+ .home-indicator{display:none}
+}
+@media (max-width:600px) and (orientation:portrait) and (max-height:680px){
+ .app{grid-template-rows:minmax(0,30%) minmax(0,70%)}
+ .top{padding-top:calc(env(safe-area-inset-top) + 8px);padding-bottom:8px}
+ .keypad{padding-top:10px;padding-bottom:calc(env(safe-area-inset-bottom) + 10px);gap:6px}
+ .keyrow{gap:7px}
+}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
 </style>
 </head>
 <body>
 <main class="app" aria-label="Calculator">
 <section class="top">
-  <div class="status"><span>9:41</span><span class="status-right"><svg viewBox="0 0 18 14" aria-hidden="true"><path d="M1 12V9m4 3V6m4 6V4m4 8V2"/></svg><svg viewBox="0 0 18 14" aria-hidden="true"><path d="M2 5.5a10 10 0 0 1 14 0M5 8.5a6 6 0 0 1 8 0M8 11.5a2 2 0 0 1 2 0"/></svg><svg viewBox="0 0 18 14" aria-hidden="true"><rect x="1" y="3" width="14" height="8" rx="2"/><path d="M16 5v4"/></svg></span></div>
   <div class="theme-switch" role="group" aria-label="Appearance">
     <button id="lightMode" class="active" aria-label="Light mode" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
     <button id="darkMode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.7 8.7 0 1 0 20.5 14.2Z"/></svg></button>
