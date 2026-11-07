@@ -1,320 +1,87 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
-  <meta name="description" content="A minimalist calculator.">
-  <title>Calc</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --ink: #f5f5f5;
-      --muted: #858585;
-      --line: rgba(255,255,255,.09);
-      --accent: #bdbdbd;
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      width: 100%; height: 100%; min-width: 280px; margin: 0;
-      overflow: hidden; overscroll-behavior: none;
-    }
-    body {
-      color: var(--ink);
-      background: #000;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    body::before, body::after { content: none; }
-    .page {
-      position: relative; z-index: 1;
-      width: min(100% - 64px, 1080px);
-      height: 100svh; height: 100dvh;
-      margin: 0 auto;
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr) auto;
-    }
-    .masthead {
-      min-height: 62px; display: flex; align-items: center;
-      justify-content: space-between; border-bottom: 1px solid var(--line);
-      font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
-    }
-    .wordmark { display: flex; align-items: center; gap: 11px; }
-    .mark {
-      width: 25px; height: 25px; display: grid; place-items: center;
-      border: 1px solid rgba(255,255,255,.12); border-radius: 8px; background: #1b1b1b;
-      font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: 0;
-    }
-    .edition { color: var(--muted); font-weight: 500; }
-    .main {
-      display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, 430px);
-      align-items: center; min-height: 0; gap: clamp(36px, 8vw, 112px);
-      padding: 28px 4.5%;
-    }
-    .intro { align-self: center; padding-bottom: 12px; }
-    .eyebrow {
-      margin: 0 0 20px; color: var(--muted); font-size: 11px;
-      font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
-    }
-    h1 {
-      max-width: 510px; margin: 0; font-family: inherit;
-      font-size: clamp(48px, 6.4vw, 82px); font-weight: 600;
-      line-height: .98; letter-spacing: -.065em;
-    }
-    .intro-copy { max-width: 310px; margin: 22px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
-    .rule-note {
-      display: flex; align-items: center; gap: 12px; margin-top: 45px;
-      color: var(--muted); font-size: 10px; letter-spacing: .11em; text-transform: uppercase;
-    }
-    .rule-note::before { content: ""; width: 34px; height: 1px; background: var(--accent); }
-    .calculator {
-      position: relative; width: 100%; overflow: hidden; padding: 18px;
-      border: 1px solid rgba(255,255,255,.08); border-radius: 28px;
-      background: rgba(255,255,255,.03);
-      box-shadow: 0 24px 64px rgba(0,0,0,.42);
-      -webkit-backdrop-filter: blur(24px);
-      backdrop-filter: blur(24px);
-    }
-    .calculator::before {
-      content: none;
-    }
-    .calc-top {
-      position: relative; display: flex; justify-content: space-between; align-items: center;
-      padding: 0 2px 13px; border-bottom: 1px solid #ffffff30;
-      font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-    }
-    .calc-top span:last-child { color: var(--muted); font-weight: 500; }
-    .display {
-      position: relative; min-height: 126px; display: flex; flex-direction: column;
-      justify-content: flex-end; align-items: flex-end; margin: 8px 0 14px;
-      padding: 18px 14px 16px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,.05); border-radius: 16px;
-      background: rgba(0,0,0,.24);
-      box-shadow: inset 0 1px 8px rgba(0,0,0,.32);
-      font-variant-numeric: tabular-nums;
-    }
-    .previous {
-      min-height: 22px; width: 100%; overflow: hidden; color: #aabbd5;
-      text-align: right; text-overflow: ellipsis; white-space: nowrap;
-      font-family: inherit; font-size: 13px;
-    }
-    .current {
-      width: 100%; overflow: hidden; color: var(--ink); text-align: right;
-      text-overflow: ellipsis; white-space: nowrap;
-      font-family: inherit; font-size: clamp(39px, 6vw, 58px);
-      line-height: 1.2; letter-spacing: -.075em;
-    }
-    .keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-    button {
-      height: 64px; min-width: 0; border: 0; border-radius: 15px;
-      background: transparent; color: var(--ink);
-      font-family: inherit; font-size: 19px; font-weight: 500; line-height: 1;
-      cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-      box-shadow: none;
-      transition: background-color .16s ease, color .16s ease, transform .18s cubic-bezier(.2,.8,.2,1);
-    }
-    button:hover {
-      background: rgba(255,255,255,.075);
-    }
-    button:active { transform: scale(.94); background: rgba(255,255,255,.13); }
-    button:focus-visible { outline: 1px solid #aaa; outline-offset: 2px; }
-    .utility { color: #a5a5a5; font-size: 13px; font-weight: 600; }
-    .operator { color: #e5e5e5; font-size: 23px; background: transparent; }
-    .operator:hover { background: rgba(255,255,255,.075); }
-    .operator svg { width: 22px; height: 22px; display: block; margin: auto; }
-    .equals { color: #fff; border: 0; background: #555; box-shadow: none; }
-    .equals:hover { background: #666; }
-    .zero { grid-column: span 2; text-align: left; padding-left: 25px; }
-    .footer {
-      min-height: 46px; display: flex; justify-content: space-between; align-items: center;
-      gap: 16px; border-top: 1px solid #ffffff25; color: var(--muted);
-      font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
-    }
-    @media (max-width: 720px) {
-      .page { width: min(100% - 30px, 480px); }
-      .masthead { min-height: 52px; font-size: 9px; }
-      .mark { width: 22px; height: 22px; }
-      .main {
-        grid-template-columns: 1fr; gap: 13px; padding: 12px 0;
-        align-content: center;
-      }
-      .intro { padding: 0 3px; }
-      .eyebrow { margin-bottom: 7px; font-size: 9px; }
-      h1 { max-width: 420px; font-size: clamp(34px, 9vw, 46px); line-height: .96; }
-      .intro-copy, .rule-note { display: none; }
-      .calculator { padding: 13px; border-radius: 23px; }
-      .calc-top { padding-bottom: 9px; font-size: 9px; }
-      .display { min-height: 83px; margin: 7px 0 10px; padding: 11px 10px; border-radius: 15px; }
-      .current { font-size: clamp(34px, 9vw, 45px); }
-      .previous { min-height: 17px; font-size: 11px; }
-      .keys { gap: 6px; }
-      button { height: clamp(43px, 7.4svh, 55px); border-radius: 12px; font-size: 17px; }
-      .operator { font-size: 21px; }
-      .equals { font-size: 22px; }
-      .footer { min-height: 38px; font-size: 8px; letter-spacing: .04em; }
-    }
-    @media (max-height: 650px) and (max-width: 720px) {
-      .main { gap: 7px; padding: 6px 0; }
-      h1 { font-size: 32px; }
-      .calculator { padding: 9px; }
-      .display { min-height: 66px; margin: 5px 0 7px; }
-      button { height: clamp(38px, 7svh, 45px); }
-      .footer { min-height: 30px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f3">
+<meta name="description" content="A clean, simple calculator.">
+<title>Calc</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;font-synthesis:none;color-scheme:light;--page:#f1f1f2;--shell:#fff;--pad:#f7f7f8;--key:#f4f4f5;--key-active:#e9e9eb;--ink:#17191f;--muted:#8b8d94;--line:rgba(0,0,0,.045);--cyan:#00cfc4;--red:#f04444;--toggle:#f3f3f5;--shadow:0 28px 70px rgba(20,20,30,.10)}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;min-width:280px;margin:0;overflow:hidden;overscroll-behavior:none}
+body{background:var(--page);color:var(--ink);display:grid;place-items:center;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:background .25s,color .25s}
+body.dark{color-scheme:dark;--page:#202229;--shell:#22252d;--pad:#272a33;--key:#242730;--key-active:#333742;--ink:#f7f7f8;--muted:#858992;--line:rgba(255,255,255,.035);--toggle:#292c35;--shadow:0 28px 70px rgba(0,0,0,.24)}
+.app{width:min(100vw,430px);height:min(100dvh,820px);min-height:500px;background:var(--shell);border-radius:30px;overflow:hidden;display:grid;grid-template-rows:42% 58%;box-shadow:var(--shadow);transition:background .25s}
+.top{position:relative;display:flex;flex-direction:column;align-items:center;padding:28px 26px 20px;min-height:0}
+.status{width:100%;display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:650;letter-spacing:-.02em;color:var(--ink)}
+.status-right{display:flex;align-items:center;gap:4px}
+.status svg{width:14px;height:12px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.theme-switch{margin-top:12px;display:flex;align-items:center;padding:4px;gap:3px;background:var(--toggle);border-radius:16px}
+.theme-switch button{width:32px;height:27px;border:0;border-radius:12px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.theme-switch button.active{color:var(--ink);background:var(--shell)}
+.theme-switch svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.readout{width:100%;margin-top:auto;text-align:right;padding:0 0 4px;overflow:hidden}
+.expression{min-height:23px;font-size:15px;font-weight:500;letter-spacing:.08em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.expression .op{color:var(--red);padding:0 3px}
+.result{font-size:clamp(36px,10vw,43px);line-height:1.15;font-weight:650;letter-spacing:-.045em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.keypad{background:var(--pad);border-radius:30px 30px 0 0;padding:20px 19px 25px;display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:9px;min-height:0}
+.keyrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-height:0}
+.key{border:0;border-radius:13px;background:var(--key);color:var(--ink);font:500 17px/1 inherit;display:grid;place-items:center;cursor:pointer;min-width:0;min-height:0;transition:background .13s,transform .13s}
+.key:active{background:var(--key-active);transform:scale(.94)}
+.key:focus-visible,.theme-switch button:focus-visible{outline:2px solid var(--muted);outline-offset:2px}
+.key.utility{color:var(--cyan);font-size:15px;font-weight:600}
+.key.operator{color:var(--red);font-size:22px;font-weight:500}
+.key.equals{color:var(--red);font-size:22px;font-weight:500}
+.key svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.home-indicator{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:94px;height:4px;border-radius:9px;background:var(--muted);opacity:.28}
+.keypad-wrap{position:relative;min-height:0}
+@media(min-width:600px){.app{height:min(92dvh,790px);border-radius:30px}.top{padding-top:28px}}
+@media(max-height:620px){.app{height:100dvh;min-height:0;border-radius:0;grid-template-rows:39% 61%}.top{padding:16px 22px 12px}.keypad{padding:13px 14px 19px;gap:6px}.keyrow{gap:7px}.key{border-radius:10px}.home-indicator{bottom:7px}}
+@media(max-width:360px){.app{border-radius:0}.keypad{padding-left:13px;padding-right:13px}.keyrow{gap:7px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
 </style>
 </head>
 <body>
-  <div class="page">
-    <header class="masthead">
-      <div class="wordmark"><span class="mark" aria-hidden="true">c</span><span>Calc</span></div>
-      <div class="edition">Standard</div>
-    </header>
-
-    <main class="main">
-      <section class="intro" aria-labelledby="page-title">
-        <h1 id="page-title">Calculator</h1>
-      </section>
-
-      <section class="calculator" aria-label="Calculator">
-        <div class="calc-top"><span></span><span></span></div>
-        <div class="display" aria-live="polite" aria-atomic="true">
-          <div class="previous" id="previous"></div>
-          <div class="current" id="current">0</div>
-        </div>
-        <div class="keys" aria-label="Calculator keys">
-          <button class="utility" data-action="clear" aria-label="Clear">AC</button>
-          <button class="utility" data-action="sign" aria-label="Change sign">+/−</button>
-          <button class="utility" data-action="percent" aria-label="Percent">%</button>
-          <button class="operator" data-op="÷" aria-label="Divide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5h.01M12 19h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button><button class="operator" data-op="×" aria-label="Multiply"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button><button class="operator" data-op="−" aria-label="Subtract"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button><button class="operator" data-op="+" aria-label="Add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <button class="zero" data-digit="0">0</button><button data-action="decimal" aria-label="Decimal point">.</button><button class="equals" data-action="equals" aria-label="Equals">=</button>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer"><span></span><span></span></footer>
+<main class="app" aria-label="Calculator">
+<section class="top">
+  <div class="status"><span>9:41</span><span class="status-right"><svg viewBox="0 0 18 14" aria-hidden="true"><path d="M1 12V9m4 3V6m4 6V4m4 8V2"/></svg><svg viewBox="0 0 18 14" aria-hidden="true"><path d="M2 5.5a10 10 0 0 1 14 0M5 8.5a6 6 0 0 1 8 0M8 11.5a2 2 0 0 1 2 0"/></svg><svg viewBox="0 0 18 14" aria-hidden="true"><rect x="1" y="3" width="14" height="8" rx="2"/><path d="M16 5v4"/></svg></span></div>
+  <div class="theme-switch" role="group" aria-label="Appearance">
+    <button id="lightMode" class="active" aria-label="Light mode" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
+    <button id="darkMode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.7 8.7 0 1 0 20.5 14.2Z"/></svg></button>
   </div>
-
-  <script>
-    (() => {
-      const currentEl = document.getElementById('current');
-      const previousEl = document.getElementById('previous');
-      let display = '0';
-      let stored = null;
-      let operator = null;
-      let waiting = false;
-      let justCalculated = false;
-
-      const pretty = value => {
-        if (!Number.isFinite(value)) return 'Error';
-        return String(Number.parseFloat(value.toPrecision(11)));
-      };
-      const render = () => { currentEl.textContent = display; };
-      const inputDigit = digit => {
-        if (display === 'Error' || waiting || justCalculated) {
-          display = digit;
-          waiting = false;
-          justCalculated = false;
-        } else if (display.replace('-', '').length < 14) {
-          display = display === '0' ? digit : display + digit;
-        }
-        render();
-      };
-      const calculate = (a, b, op) => {
-        switch (op) {
-          case '+': return a + b;
-          case '−': return a - b;
-          case '×': return a * b;
-          case '÷': return b === 0 ? NaN : a / b;
-          default: return b;
-        }
-      };
-      const chooseOperator = next => {
-        if (display === 'Error') return;
-        const value = Number(display);
-        if (operator && !waiting) {
-          stored = calculate(stored, value, operator);
-          display = pretty(stored);
-          render();
-        } else if (stored === null || !operator) stored = value;
-        operator = next;
-        waiting = true;
-        justCalculated = false;
-        previousEl.textContent = pretty(stored) + ' ' + next;
-      };
-      const equals = () => {
-        if (!operator || stored === null || waiting || display === 'Error') return;
-        const a = stored, b = Number(display), op = operator;
-        display = pretty(calculate(a, b, op));
-        previousEl.textContent = pretty(a) + ' ' + op + ' ' + pretty(b) + ' =';
-        stored = null;
-        operator = null;
-        waiting = true;
-        justCalculated = true;
-        render();
-      };
-      const clear = () => {
-        display = '0'; stored = null; operator = null;
-        waiting = false; justCalculated = false;
-        previousEl.textContent = '';
-        render();
-      };
-      const act = action => {
-        if (action === 'clear') return clear();
-        if (display === 'Error') return clear();
-        if (action === 'decimal') {
-          if (waiting || justCalculated) {
-            display = '0.'; waiting = false; justCalculated = false;
-          } else if (!display.includes('.')) display += '.';
-        }
-        if (action === 'sign' && Number(display) !== 0) {
-          display = display.startsWith('-') ? display.slice(1) : '-' + display;
-        }
-        if (action === 'percent') display = pretty(Number(display) / 100);
-        if (action === 'backspace' && !waiting && !justCalculated) {
-          display = display.length > 1 ? display.slice(0, -1) : '0';
-          if (display === '-') display = '0';
-        }
-        render();
-      };
-
-      document.querySelector('.keys').addEventListener('click', event => {
-        const button = event.target.closest('button');
-        if (!button) return;
-        if (button.dataset.digit !== undefined) inputDigit(button.dataset.digit);
-        else if (button.dataset.op) chooseOperator(button.dataset.op);
-        else if (button.dataset.action === 'equals') equals();
-        else act(button.dataset.action);
-      });
-      const bounceAt = event => {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const touched = event.target instanceof Element ? event.target : document.body;
-        const surface = touched.closest('button, .calculator, .intro, .masthead, .footer, .main') || document.querySelector('.page');
-        surface.animate(
-          [{ transform: 'scale(1)' }, { transform: 'scale(.985)', offset: .34 }, { transform: 'scale(1.012)', offset: .72 }, { transform: 'scale(1)' }],
-          { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' }
-        );
-      };
-      document.addEventListener('pointerup', bounceAt, { passive: true });
-      document.addEventListener('keydown', event => {
-        if (/^[0-9]$/.test(event.key)) { inputDigit(event.key); return; }
-        const ops = {'+': '+', '-': '−', '*': '×', '/': '÷'};
-        if (ops[event.key]) { event.preventDefault(); chooseOperator(ops[event.key]); return; }
-        if (event.key === 'Enter' || event.key === '=') { event.preventDefault(); equals(); return; }
-        if (event.key === '.') { act('decimal'); return; }
-        if (event.key === 'Escape') { clear(); return; }
-        if (event.key === 'Backspace') { event.preventDefault(); act('backspace'); return; }
-        if (event.key === '%') act('percent');
-      });
-      render();
-    })();
-  </script>
+  <div class="readout"><div class="expression" id="previous" aria-live="polite"></div><div class="result" id="current">0</div></div>
+</section>
+<section class="keypad-wrap" aria-label="Calculator keypad">
+<div class="keypad">
+ <div class="keyrow"><button class="key utility" data-action="clear">AC</button><button class="key utility" data-action="sign" aria-label="Change sign">+/−</button><button class="key utility" data-action="percent">%</button><button class="key operator" data-op="÷" aria-label="Divide"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5h.01M12 19h.01"/></svg></button></div>
+ <div class="keyrow"><button class="key" data-digit="7">7</button><button class="key" data-digit="8">8</button><button class="key" data-digit="9">9</button><button class="key operator" data-op="×" aria-label="Multiply"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+ <div class="keyrow"><button class="key" data-digit="4">4</button><button class="key" data-digit="5">5</button><button class="key" data-digit="6">6</button><button class="key operator" data-op="−" aria-label="Subtract"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
+ <div class="keyrow"><button class="key" data-digit="1">1</button><button class="key" data-digit="2">2</button><button class="key" data-digit="3">3</button><button class="key operator" data-op="+" aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+ <div class="keyrow"><button class="key" data-action="backspace" aria-label="Delete last digit"><svg viewBox="0 0 24 24"><path d="M9 5 3 12l6 7h11V5H9Z"/><path d="m12 9 6 6m0-6-6 6"/></svg></button><button class="key" data-digit="0">0</button><button class="key" data-action="decimal">.</button><button class="key equals" data-action="equals" aria-label="Equals"><svg viewBox="0 0 24 24"><path d="M5 9h14M5 15h14"/></svg></button></div>
+</div><div class="home-indicator" aria-hidden="true"></div>
+</section>
+</main>
+<script>
+(()=>{
+const currentEl=document.getElementById('current'),previousEl=document.getElementById('previous');
+let display='0',stored=null,operator=null,waiting=false,justCalculated=false;
+const pretty=v=>{if(!Number.isFinite(v))return'Error';return String(Number.parseFloat(v.toPrecision(11)))};
+const format=v=>{if(v==='Error')return v;const parts=v.split('.');const sign=parts[0].startsWith('-')?'-':'';const digits=sign?parts[0].slice(1):parts[0];return sign+digits.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(parts.length>1?'.'+parts[1]:'')};
+const render=()=>{currentEl.textContent=format(display)};
+const renderExpression=(a,op,b='')=>{previousEl.innerHTML='';const text=document.createElement('span');text.textContent=a+' ';previousEl.append(text);const symbol=document.createElement('span');symbol.className='op';symbol.textContent=op;previousEl.append(symbol);if(b){const tail=document.createElement('span');tail.textContent=' '+b;previousEl.append(tail)}};
+const inputDigit=d=>{if(display==='Error'||waiting||justCalculated){display=d;waiting=false;justCalculated=false}else if(display.replace('-','').length<14)display=display==='0'?d:display+d;render()};
+const calculate=(a,b,op)=>({'+':a+b,'−':a-b,'×':a*b,'÷':b===0?NaN:a/b}[op]);
+const chooseOperator=next=>{if(display==='Error')return;const value=Number(display);if(operator&&!waiting){stored=calculate(stored,value,operator);display=pretty(stored);render()}else if(stored===null||!operator)stored=value;operator=next;waiting=true;justCalculated=false;renderExpression(format(pretty(stored)),next)};
+const equals=()=>{if(!operator||stored===null||waiting||display==='Error')return;const a=stored,b=Number(display),op=operator;display=pretty(calculate(a,b,op));renderExpression(format(pretty(a)),op,format(pretty(b))+' =');stored=null;operator=null;waiting=true;justCalculated=true;render()};
+const clear=()=>{display='0';stored=null;operator=null;waiting=false;justCalculated=false;previousEl.textContent='';render()};
+const act=a=>{if(a==='clear')return clear();if(display==='Error')return clear();if(a==='decimal'){if(waiting||justCalculated){display='0.';waiting=false;justCalculated=false}else if(!display.includes('.'))display+='.'}if(a==='sign'&&Number(display)!==0)display=display.startsWith('-')?display.slice(1):'-'+display;if(a==='percent')display=pretty(Number(display)/100);if(a==='backspace'&&!waiting&&!justCalculated){display=display.length>1?display.slice(0,-1):'0';if(display==='-')display='0'}render()};
+document.querySelector('.keypad').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.digit!==undefined)inputDigit(b.dataset.digit);else if(b.dataset.op)chooseOperator(b.dataset.op);else if(b.dataset.action==='equals')equals();else act(b.dataset.action)});
+const setTheme=dark=>{document.body.classList.toggle('dark',dark);document.getElementById('lightMode').classList.toggle('active',!dark);document.getElementById('darkMode').classList.toggle('active',dark);document.getElementById('lightMode').setAttribute('aria-pressed',String(!dark));document.getElementById('darkMode').setAttribute('aria-pressed',String(dark));document.querySelector('meta[name="theme-color"]').content=dark?'#202229':'#f1f1f2'};
+document.getElementById('lightMode').addEventListener('click',()=>setTheme(false));document.getElementById('darkMode').addEventListener('click',()=>setTheme(true));
+document.addEventListener('keydown',e=>{if(/^[0-9]$/.test(e.key)){inputDigit(e.key);return}const ops={'+':'+','-':'−','*':'×','/':'÷'};if(ops[e.key]){e.preventDefault();chooseOperator(ops[e.key]);return}if(e.key==='Enter'||e.key==='='){e.preventDefault();equals();return}if(e.key==='.')act('decimal');if(e.key==='Escape')clear();if(e.key==='Backspace'){e.preventDefault();act('backspace')}if(e.key==='%')act('percent')});
+render();
+})();
+</script>
 </body>
 </html>
