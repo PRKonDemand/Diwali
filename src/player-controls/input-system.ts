@@ -148,7 +148,14 @@ export class PlayerInputSystem {
     };
   }
   setPaused(paused: boolean): void { this.paused = paused; if (paused) this.reset(); }
-  reset(): void { this.held.clear(); this.joystick = { x: 0, y: 0, active: false, pointerId: -1 }; }
+  reset(): void {
+    this.held.clear();
+    const pointerId = this.joystick.pointerId;
+    if (pointerId !== -1 && this.joystickElement) {
+      try { this.joystickElement.releasePointerCapture(pointerId); } catch { /* capture may already be lost */ }
+    }
+    this.joystick = { x: 0, y: 0, active: false, pointerId: -1 };
+  }
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true; this.reset(); this.detachJoystick();
