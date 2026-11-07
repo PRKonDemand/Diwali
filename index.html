@@ -102,17 +102,41 @@ body.dark{color-scheme:dark;--page:#202229;--shell:#22252d;--pad:#272a33;--key:#
  .keyrow{gap:7px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+
+/* Feature controls and panels */
+.top-tools{width:100%;display:flex;align-items:center;justify-content:space-between}
+.tool-btn{width:38px;height:38px;border:0;border-radius:13px;background:var(--toggle);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.tool-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.panel{position:absolute;inset:0;z-index:5;background:var(--shell);padding:calc(env(safe-area-inset-top) + 18px) 20px 20px;display:none;flex-direction:column;gap:14px;overflow:auto}
+.panel.open{display:flex}
+.panel-head{display:flex;align-items:center;justify-content:space-between;font-size:19px;font-weight:650}
+.panel-list{display:flex;flex-direction:column;gap:8px}
+.history-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;border-radius:13px;background:var(--pad);font-variant-numeric:tabular-nums}
+.history-item button{border:0;background:transparent;color:var(--ink);font:inherit;text-align:right}
+.history-item small{display:block;color:var(--muted);font-size:12px}
+.panel-action{border:0;border-radius:12px;padding:11px 14px;background:var(--key);color:var(--ink);font:inherit}
+.theme-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.theme-option{padding:14px;border:2px solid transparent;border-radius:14px;background:var(--pad);color:var(--ink);font:inherit;text-align:left}
+.theme-option[aria-pressed=true]{border-color:var(--cyan)}
+.theme-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:-1px}
+body[data-theme="midnight"]{--page:#101216;--shell:#191c22;--pad:#222630;--key:#2c313d;--key-active:#3a4150;--ink:#f5f6f8;--muted:#9ba3b1;--cyan:#75d8ce;--red:#ff858b;--toggle:#272c36;--shadow:0 28px 70px rgba(0,0,0,.3)}
+body[data-theme="mint"]{--page:#e8f1ed;--shell:#f8fffb;--pad:#edf7f1;--key:#e0eee6;--key-active:#cfe3d7;--ink:#18342b;--muted:#71877c;--cyan:#168f79;--red:#d45d62;--toggle:#e6f2eb;--shadow:0 28px 70px rgba(20,60,40,.10)}
+body[data-theme="lavender"]{--page:#eeeaf5;--shell:#fcfaff;--pad:#f3eff9;--key:#e9e2f2;--key-active:#dcd1e9;--ink:#292238;--muted:#89819a;--cyan:#8b69c6;--red:#d65c79;--toggle:#eee8f6;--shadow:0 28px 70px rgba(50,30,70,.10)}
+@media(max-width:600px) and (orientation:portrait){.top-tools{width:100%}.tool-btn{width:36px;height:36px}}
+
 </style>
 </head>
 <body>
 <main class="app" aria-label="Calculator">
 <section class="top">
-  <div class="theme-switch" role="group" aria-label="Appearance">
+  <div class="top-tools"><div class="theme-switch" role="group" aria-label="Appearance">
     <button id="lightMode" class="active" aria-label="Light mode" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
     <button id="darkMode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.7 8.7 0 1 0 20.5 14.2Z"/></svg></button>
-  </div>
+  </div><button class="tool-btn" id="historyOpen" aria-label="Calculation history"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></button><button class="tool-btn" id="themesOpen" aria-label="Choose theme"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.8 1.8 0 0 1 1.3-3.1H18a3 3 0 0 0 3-3c0-4.7-4-8.5-9-8.5Z"/><path d="M7.5 10h.01M10 7h.01M15 7.5h.01"/></svg></button></div>
   <div class="readout"><div class="expression" id="previous" aria-live="polite"></div><div class="result" id="current">0</div></div>
 </section>
+<section class="panel" id="historyPanel" aria-label="Calculation history"><div class="panel-head"><span>History</span><button class="tool-btn" data-close="historyPanel" aria-label="Close history">×</button></div><div class="panel-list" id="historyList"></div><button class="panel-action" id="clearHistory">Clear history</button></section>
+<section class="panel" id="themesPanel" aria-label="Custom themes"><div class="panel-head"><span>Themes</span><button class="tool-btn" data-close="themesPanel" aria-label="Close themes">×</button></div><div class="theme-options"><button class="theme-option" data-theme-choice="light"><span class="theme-dot" style="background:#f1f1f2"></span>Light</button><button class="theme-option" data-theme-choice="dark"><span class="theme-dot" style="background:#22252d"></span>Dark</button><button class="theme-option" data-theme-choice="midnight"><span class="theme-dot" style="background:#101216"></span>Midnight</button><button class="theme-option" data-theme-choice="mint"><span class="theme-dot" style="background:#b9d9c8"></span>Mint</button><button class="theme-option" data-theme-choice="lavender"><span class="theme-dot" style="background:#cfc1e5"></span>Lavender</button></div></section>
 <section class="keypad-wrap" aria-label="Calculator keypad">
 <div class="keypad">
  <div class="keyrow"><button class="key utility" data-action="clear">AC</button><button class="key utility" data-action="sign" aria-label="Change sign">+/−</button><button class="key utility" data-action="percent">%</button><button class="key operator" data-op="÷" aria-label="Divide"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5h.01M12 19h.01"/></svg></button></div>
@@ -126,7 +150,7 @@ body.dark{color-scheme:dark;--page:#202229;--shell:#22252d;--pad:#272a33;--key:#
 <script>
 (()=>{
 const currentEl=document.getElementById('current'),previousEl=document.getElementById('previous');
-let display='0',stored=null,operator=null,waiting=false,justCalculated=false;
+let display='0',stored=null,operator=null,waiting=false,justCalculated=false;\nlet history=JSON.parse(localStorage.getItem('calc-history')||'[]');\nconst buzz=()=>{try{if(navigator.vibrate)navigator.vibrate(8)}catch(_){}};\nconst saveHistory=(entry)=>{history.unshift(entry);history=history.slice(0,50);localStorage.setItem('calc-history',JSON.stringify(history));renderHistory()};\nconst renderHistory=()=>{const el=document.getElementById('historyList');el.innerHTML='';if(!history.length){el.textContent='No calculations yet';return}history.forEach((item,i)=>{const row=document.createElement('div');row.className='history-item';const left=document.createElement('div');left.textContent=item.expression;const right=document.createElement('button');right.innerHTML='';right.textContent=item.result;right.addEventListener('click',()=>{display=item.result.replace(/,/g,'');stored=null;operator=null;waiting=false;justCalculated=false;previousEl.textContent=item.expression;render();closePanels()});row.append(left,right);el.append(row)})};\nconst closePanels=()=>document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
 const pretty=v=>{if(!Number.isFinite(v))return'Error';return String(Number.parseFloat(v.toPrecision(11)))};
 const format=v=>{if(v==='Error')return v;const parts=v.split('.');const sign=parts[0].startsWith('-')?'-':'';const digits=sign?parts[0].slice(1):parts[0];return sign+digits.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(parts.length>1?'.'+parts[1]:'')};
 const render=()=>{currentEl.textContent=format(display)};
@@ -134,14 +158,14 @@ const renderExpression=(a,op,b='')=>{previousEl.innerHTML='';const text=document
 const inputDigit=d=>{if(display==='Error'||waiting||justCalculated){display=d;waiting=false;justCalculated=false}else if(display.replace('-','').length<14)display=display==='0'?d:display+d;render()};
 const calculate=(a,b,op)=>({'+':a+b,'−':a-b,'×':a*b,'÷':b===0?NaN:a/b}[op]);
 const chooseOperator=next=>{if(display==='Error')return;const value=Number(display);if(operator&&!waiting){stored=calculate(stored,value,operator);display=pretty(stored);render()}else if(stored===null||!operator)stored=value;operator=next;waiting=true;justCalculated=false;renderExpression(format(pretty(stored)),next)};
-const equals=()=>{if(!operator||stored===null||waiting||display==='Error')return;const a=stored,b=Number(display),op=operator;display=pretty(calculate(a,b,op));renderExpression(format(pretty(a)),op,format(pretty(b))+' =');stored=null;operator=null;waiting=true;justCalculated=true;render()};
+const equals=()=>{if(!operator||stored===null||waiting||display==='Error')return;const a=stored,b=Number(display),op=operator;const expression=format(pretty(a))+' '+op+' '+format(pretty(b));display=pretty(calculate(a,b,op));saveHistory({expression,result:format(display),time:Date.now()});renderExpression(format(pretty(a)),op,format(pretty(b))+' =');stored=null;operator=null;waiting=true;justCalculated=true;render()};
 const clear=()=>{display='0';stored=null;operator=null;waiting=false;justCalculated=false;previousEl.textContent='';render()};
 const act=a=>{if(a==='clear')return clear();if(display==='Error')return clear();if(a==='decimal'){if(waiting||justCalculated){display='0.';waiting=false;justCalculated=false}else if(!display.includes('.'))display+='.'}if(a==='sign'&&Number(display)!==0)display=display.startsWith('-')?display.slice(1):'-'+display;if(a==='percent')display=pretty(Number(display)/100);if(a==='backspace'&&!waiting&&!justCalculated){display=display.length>1?display.slice(0,-1):'0';if(display==='-')display='0'}render()};
-document.querySelector('.keypad').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.digit!==undefined)inputDigit(b.dataset.digit);else if(b.dataset.op)chooseOperator(b.dataset.op);else if(b.dataset.action==='equals')equals();else act(b.dataset.action)});
-const setTheme=dark=>{document.body.classList.toggle('dark',dark);document.getElementById('lightMode').classList.toggle('active',!dark);document.getElementById('darkMode').classList.toggle('active',dark);document.getElementById('lightMode').setAttribute('aria-pressed',String(!dark));document.getElementById('darkMode').setAttribute('aria-pressed',String(dark));document.querySelector('meta[name="theme-color"]').content=dark?'#202229':'#f1f1f2'};
-document.getElementById('lightMode').addEventListener('click',()=>setTheme(false));document.getElementById('darkMode').addEventListener('click',()=>setTheme(true));
+document.querySelector('.keypad').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;buzz();if(b.dataset.digit!==undefined)inputDigit(b.dataset.digit);else if(b.dataset.op)chooseOperator(b.dataset.op);else if(b.dataset.action==='equals')equals();else act(b.dataset.action)});
+const setTheme=dark=>{document.body.dataset.theme=dark?'dark':'light';document.body.classList.toggle('dark',dark);localStorage.setItem('calc-theme',dark?'dark':'light');document.getElementById('lightMode').classList.toggle('active',!dark);document.getElementById('darkMode').classList.toggle('active',dark);document.getElementById('lightMode').setAttribute('aria-pressed',String(!dark));document.getElementById('darkMode').setAttribute('aria-pressed',String(dark));document.querySelector('meta[name="theme-color"]').content=dark?'#202229':'#f1f1f2'};
+const applyTheme=name=>{document.body.dataset.theme=name;document.body.classList.toggle('dark',['dark','midnight'].includes(name));localStorage.setItem('calc-theme',name);const dark=['dark','midnight'].includes(name);document.getElementById('lightMode').classList.toggle('active',!dark);document.getElementById('darkMode').classList.toggle('active',dark);document.getElementById('lightMode').setAttribute('aria-pressed',String(!dark));document.getElementById('darkMode').setAttribute('aria-pressed',String(dark));document.querySelector('meta[name="theme-color"]').content=({light:'#f1f1f2',dark:'#202229',midnight:'#101216',mint:'#e8f1ed',lavender:'#eeeaf5'})[name];document.querySelectorAll('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeChoice===name)))};\ndocument.getElementById('lightMode').addEventListener('click',()=>applyTheme('light'));document.getElementById('darkMode').addEventListener('click',()=>applyTheme('dark'));\ndocument.getElementById('historyOpen').addEventListener('click',()=>{renderHistory();document.getElementById('historyPanel').classList.add('open')});document.getElementById('themesOpen').addEventListener('click',()=>document.getElementById('themesPanel').classList.add('open'));document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).classList.remove('open')));document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>{applyTheme(b.dataset.themeChoice);closePanels()}));document.getElementById('clearHistory').addEventListener('click',()=>{history=[];localStorage.removeItem('calc-history');renderHistory()});
 document.addEventListener('keydown',e=>{if(/^[0-9]$/.test(e.key)){inputDigit(e.key);return}const ops={'+':'+','-':'−','*':'×','/':'÷'};if(ops[e.key]){e.preventDefault();chooseOperator(ops[e.key]);return}if(e.key==='Enter'||e.key==='='){e.preventDefault();equals();return}if(e.key==='.')act('decimal');if(e.key==='Escape')clear();if(e.key==='Backspace'){e.preventDefault();act('backspace')}if(e.key==='%')act('percent')});
-render();
+applyTheme(localStorage.getItem('calc-theme')||'light');renderHistory();render();
 })();
 </script>
 </body>
