@@ -58,3 +58,10 @@ export const DEFAULT_PEDESTRIAN_CONFIG: PedestrianConfig = {
   avoidanceRadius: 2.4, separationWeight: 1.65, obstacleWeight: 2.2, waypointRadius: 2.2,
   seed: 20261107, debug: false,
 };
+
+/** Conservative starting profile for low-end mobile; tune after device profiling. */
+export const MOBILE_PEDESTRIAN_CONFIG: Partial<PedestrianConfig> = {
+  maxAgents: 120, spawnCount: 80, nearDistance: 35, midDistance: 95, farDistance: 165,
+  updateIntervalNear: 0, updateIntervalMid: 0.18, updateIntervalFar: 0.6,
+  avoidanceRadius: 2.1, separationWeight: 1.45, obstacleWeight: 2,
+};
