@@ -3988,7 +3988,7 @@ window.addEventListener("keydown",playerKeyDown);window.addEventListener("keyup"
 function playerSetMode(enabled){
   playerMode=enabled;playerHud.classList.toggle("active",enabled);playerModeButton.textContent=enabled?"Free camera":"Enter city";
   kt.enabled=!enabled;clearPlayerInput();
-  if(enabled){playerYaw=playerRoot.rotation.y;playerCameraTarget.set(playerRoot.position.x,1.35,playerRoot.position.z);playerCameraPosition.set(playerRoot.position.x-Math.sin(playerYaw)*9,6.5,playerRoot.position.z-Math.cos(playerYaw)*9);gn.position.copy(playerCameraPosition);kt.target.copy(playerCameraTarget);kt.update();}
+  if(enabled){playerYaw=playerRoot.rotation.y;playerCameraTarget.set(playerRoot.position.x,1.35,playerRoot.position.z);playerCameraPosition.set(playerRoot.position.x-Math.sin(playerYaw)*9,6.5,playerRoot.position.z+Math.cos(playerYaw)*9);gn.position.copy(playerCameraPosition);kt.target.copy(playerCameraTarget);kt.update();}
   else {kt.target.set(playerRoot.position.x,0,playerRoot.position.z);gn.position.set(playerRoot.position.x+10,12,playerRoot.position.z+16);kt.update();}
 }
 playerModeButton.addEventListener("click",()=>playerSetMode(!playerMode));
