@@ -81,7 +81,7 @@ describe('ThirdPersonMotionController', () => {
     const target = new FakeTarget(), input = new PlayerInputSystem({ target: target as unknown as Window, documentTarget: undefined });
     target.dispatchEvent(keyboard('keydown', 'KeyW'));
     const player = new Object3D(), camera = new Camera();
-    camera.rotation.y = Math.PI / 2;
+    camera.rotation.y = -Math.PI / 2;
     const controller = new ThirdPersonMotionController({ player, camera, collisionWorld: collision }, input);
     controller.update(1 / 60);
     expect(player.position.x).toBeGreaterThan(0);
