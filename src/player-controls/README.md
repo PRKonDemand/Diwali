@@ -22,6 +22,7 @@ const motion = new ThirdPersonMotionController(
 
 // The UI owns the joystick element and visuals; pass only its active surface.
 const detachJoystick = input.attachJoystick(joystickHitArea, { maxRadius: 54 });
+// A mobile Run button can call input.setAction('Run', true/false) on press/release.
 
 // In the existing render/update loop:
 const locomotion = motion.update(deltaSeconds);
