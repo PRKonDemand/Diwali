@@ -1,13 +1,13 @@
 export function createInputController({ canvas, joystickBase, joystickKnob, cameraButton }) {
   const keys = new Set();
-  const state = { cameraYaw: 0, cameraDistance: 8.5, cameraMode: "third", sensitivity: 1, cameraPreset: 1 };
+  const state = { cameraYaw: 0, cameraDistance: 8.5, cameraMode: "third", sensitivity: 1, cameraPreset: 0 };
   const movement = { x: 0, y: 0 };
   let joystickPointer = null;
   let cameraPointer = null;
   let lastPointerX = 0;
   const cameraPresets = [
-    { mode: "first", distance: 0, label: "First-person camera" },
     { mode: "third", distance: 8.5, label: "Third-person close camera" },
+    { mode: "first", distance: 0, label: "First-person camera" },
     { mode: "third", distance: 11.5, label: "Third-person medium camera" },
     { mode: "third", distance: 15, label: "Third-person wide camera" }
   ];
