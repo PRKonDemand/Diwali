@@ -18,7 +18,7 @@
   function clear(){expression='';previous.textContent='';current.textContent='0'}
   function deleteLast(){if(!expression)return;const fn=expression.match(/(?:asin|acos|atan|sqrt|cbrt|log2|sin|cos|tan|abs|log|ln)\($/);expression=fn?expression.slice(0,-fn[0].length):expression.slice(0,-1);renderExpression()}
   function tokenize(input){
-    const normalized=input.replace(/π/g,'pi').replace(/×/g,'*').replace(/÷/g,'/');
+    const normalized=input.toLowerCase().replace(/π/g,'pi').replace(/×/g,'*').replace(/÷/g,'/');
     const re=/\s*(?:(\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)|(pi|ans|log2|asin|acos|atan|sqrt|cbrt|sin|cos|tan|abs|log|ln|e)|([()+\-*/^!%]))/gy;
     const out=[];let pos=0;
     while(pos<normalized.length){re.lastIndex=pos;const m=re.exec(normalized);if(!m)throw Error('Invalid expression');out.push(m[1]!==undefined?{type:'number',value:Number(m[1])}:m[2]?{type:'name',value:m[2]}:{type:'symbol',value:m[3]});pos=re.lastIndex}
@@ -67,7 +67,7 @@
     }catch(_){current.textContent='Error';previous.textContent=expression;expression=''}
   }
   function insertFunction(name){append(name+'(')}
-  function unaryTransform(fn){if(!expression){expression='ANS';}append(fn+'(');append('ANS');append(')')}
+  function unaryTransform(fn){const base=expression||'ANS';expression=fn==='reciprocal'?'1/('+base+')':fn+'('+base+')';renderExpression()}
   function action(name){
     if(name.startsWith('digit:')){append(name.slice(6));return}
     if(name.startsWith('op:')){append(name.slice(3));return}
