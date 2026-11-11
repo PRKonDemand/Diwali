@@ -23,8 +23,10 @@
     state.ridingTimer+=dt;
     // The runner stays supported on the moving carriage until its end passes.
     state.jumpY=2.65;
-    const trainLength=4.4;
-    const trainEdgePassed=state.ridingTimer>=2.6;
+    const trainLength=state.speed*2.6;
+    const distanceAlongCarriage=state.ridingTimer*state.speed;
+    const trainRearEdge=distanceAlongCarriage-trainLength;
+    const trainEdgePassed=trainRearEdge>=-trainLength;
     if(trainEdgePassed){
      state.ridingTrainId=null;
      state.falling=true;
@@ -69,7 +71,7 @@
   window.GameUI?.distance(Math.floor(state.distance));
  }
  function frame(now){const dt=Math.min(.04,(now-last)/1000||0);last=now;update(dt);window.GameRenderer?.draw(state,elapsed);raf=requestAnimationFrame(frame)}
- function start(){cancelAnimationFrame(raf);Object.assign(state,{lane:1,lanePosition:1,objects:[],distance:0,coins:0,speed:11,running:true,paused:false,over:false,jumpY:0,jumpTimer:0,sliding:false,slideTimer:0,runTime:0,magnetTimer:0,ridingTrainId:null,ridingTimer:0});spawn=.8;coinSpawn=1.4;magnetSpawn=8;elapsed=0;last=performance.now();window.GameUI?.started();window.GameSound?.start();raf=requestAnimationFrame(frame)}
+ function start(){cancelAnimationFrame(raf);Object.assign(state,{lane:1,lanePosition:1,objects:[],distance:0,coins:0,speed:11,running:true,paused:false,over:false,jumpY:0,jumpTimer:0,sliding:false,slideTimer:0,runTime:0,magnetTimer:0,ridingTrainId:null,ridingTimer:0,falling:false,fallVelocity:0,fallForwardVelocity:0,playerZ:4,fallLanded:false});spawn=.8;coinSpawn=1.4;magnetSpawn=8;elapsed=0;last=performance.now();window.GameUI?.started();window.GameSound?.start();raf=requestAnimationFrame(frame)}
  function end(){state.running=false;state.over=true;window.GameSound?.stop();window.GameSound?.crash();window.GameUI?.ended(Math.floor(state.distance),state.coins)}
  function move(d){if(state.running&&!state.paused){const before=state.lane;state.lane=Math.max(0,Math.min(2,state.lane+d));if(before!==state.lane)window.GameSound?.lane()}}
  function jump(){if(!state.running||state.paused||state.sliding)return;if(state.ridingTrainId!==null){const train=state.objects.find(o=>o.id===state.ridingTrainId);if(train){train.z=9.2;train.hit=true}state.ridingTrainId=null;state.ridingTimer=0;state.jumpY=0}if(!state.jumpTimer&&!state.falling){state.jumpTimer=.001;state.jumpY=0;window.GameSound?.jump()}}
