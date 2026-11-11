@@ -3,46 +3,46 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f3">
-<meta name="description" content="A clean, simple calculator.">
-<title>Calc</title>
+<meta name="theme-color" content="#071b2d">
+<meta name="description" content="Coastal Rush — an endless railway runner across the ocean.">
+<title>Coastal Rush — Endless Runner</title>
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/scientific.css">
 </head>
 <body>
-<main class="app" aria-label="Calculator">
-<section class="top">
-  <div class="top-tools"><div class="theme-switch" role="group" aria-label="Appearance">
-    <button id="lightMode" class="active" aria-label="Light mode" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
-    <button id="darkMode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.7 8.7 0 1 0 20.5 14.2Z"/></svg></button>
-  </div><button class="tool-btn" id="scientificToggle" aria-label="Scientific calculator" aria-pressed="false" title="Scientific calculator">ƒx</button><button class="tool-btn" id="historyOpen" aria-label="Calculation history"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></button><button class="tool-btn whatsapp-btn" id="shareWhatsApp" aria-label="Share calculation on WhatsApp" title="Share on WhatsApp"><svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d="M12.04 2a9.85 9.85 0 0 0-8.48 14.87L2.2 22l5.27-1.38A9.95 9.95 0 1 0 12.04 2Zm0 17.98a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.13.82.84-3.05-.2-.31A8.13 8.13 0 1 1 12.04 20Zm4.46-6.08c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.46-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.15 1.52.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg></button><button class="tool-btn" id="themesOpen" aria-label="Choose theme"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.8 1.8 0 0 1 1.3-3.1H18a3 3 0 0 0 3-3c0-4.7-4-8.5-9-8.5Z"/><path d="M7.5 10h.01M10 7h.01M15 7.5h.01"/></svg></button></div>
-  <div class="readout"><div class="expression" id="previous" aria-live="polite"></div><div class="result" id="current">0</div></div>
-</section>
-<section class="panel" id="historyPanel" aria-label="Calculation history"><div class="panel-head"><span>History</span><button class="tool-btn" data-close="historyPanel" aria-label="Close history">×</button></div><div class="panel-list" id="historyList"></div><button class="panel-action" id="clearHistory">Clear history</button></section>
-<section class="panel" id="themesPanel" aria-label="Custom themes"><div class="panel-head"><span>Themes</span><button class="tool-btn" data-close="themesPanel" aria-label="Close themes">×</button></div><div class="theme-options"><button class="theme-option" data-theme-choice="light"><span class="theme-dot" style="background:#f1f1f2"></span>Light</button><button class="theme-option" data-theme-choice="dark"><span class="theme-dot" style="background:#22252d"></span>Dark</button><button class="theme-option" data-theme-choice="midnight"><span class="theme-dot" style="background:#101216"></span>Midnight</button><button class="theme-option" data-theme-choice="mint"><span class="theme-dot" style="background:#b9d9c8"></span>Mint</button><button class="theme-option" data-theme-choice="lavender"><span class="theme-dot" style="background:#cfc1e5"></span>Lavender</button></div></section>
-<section class="keypad-wrap" aria-label="Calculator keypad">
-<div class="keypad">
- <div class="keyrow"><button class="key utility" data-action="clear">AC</button><button class="key utility" data-action="sign" aria-label="Change sign">+/−</button><button class="key utility" data-action="percent">%</button><button class="key operator" data-op="÷" aria-label="Divide"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5h.01M12 19h.01"/></svg></button></div>
- <div class="keyrow"><button class="key" data-digit="7">7</button><button class="key" data-digit="8">8</button><button class="key" data-digit="9">9</button><button class="key operator" data-op="×" aria-label="Multiply"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
- <div class="keyrow"><button class="key" data-digit="4">4</button><button class="key" data-digit="5">5</button><button class="key" data-digit="6">6</button><button class="key operator" data-op="−" aria-label="Subtract"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
- <div class="keyrow"><button class="key" data-digit="1">1</button><button class="key" data-digit="2">2</button><button class="key" data-digit="3">3</button><button class="key operator" data-op="+" aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
- <div class="keyrow"><button class="key" data-action="backspace" aria-label="Delete last digit"><svg viewBox="0 0 24 24"><path d="M9 5 3 12l6 7h11V5H9Z"/><path d="m12 9 6 6m0-6-6 6"/></svg></button><button class="key" data-digit="0">0</button><button class="key" data-action="decimal">.</button><button class="key equals" data-action="equals" aria-label="Equals"><svg viewBox="0 0 24 24"><path d="M5 9h14M5 15h14"/></svg></button></div>
-</div>
-<div class="scientific-keypad" id="scientificKeypad" aria-label="Scientific calculator keypad" hidden>
-  <div class="science-row"><button class="key utility" data-science="angle">DEG</button><button class="key utility" data-science="clear">AC</button><button class="key utility" data-science="delete">DEL</button><button class="key" data-science="(">(</button><button class="key" data-science=")">)</button></div>
-  <div class="science-row"><button class="key utility" data-science="sin">sin</button><button class="key utility" data-science="cos">cos</button><button class="key utility" data-science="tan">tan</button><button class="key utility" data-science="asin">sin⁻¹</button><button class="key utility" data-science="acos">cos⁻¹</button></div>
-  <div class="science-row"><button class="key utility" data-science="atan">tan⁻¹</button><button class="key" data-science="pi">π</button><button class="key" data-science="e">e</button><button class="key" data-science="square">x²</button><button class="key" data-science="cube">x³</button></div>
-  <div class="science-row"><button class="key utility" data-science="sqrt">√</button><button class="key utility" data-science="cbrt">∛</button><button class="key" data-science="power">xʸ</button><button class="key" data-science="reciprocal">1/x</button><button class="key" data-science="abs">|x|</button></div>
-  <div class="science-row"><button class="key utility" data-science="factorial">n!</button><button class="key utility" data-science="log">log</button><button class="key utility" data-science="ln">ln</button><button class="key utility" data-science="log2">log₂</button><button class="key utility" data-science="percent">%</button></div>
-  <div class="science-row"><button class="key" data-science="digit:7">7</button><button class="key" data-science="digit:8">8</button><button class="key" data-science="digit:9">9</button><button class="key operator" data-science="op:/">÷</button><button class="key operator" data-science="op:*">×</button></div>
-  <div class="science-row"><button class="key" data-science="digit:4">4</button><button class="key" data-science="digit:5">5</button><button class="key" data-science="digit:6">6</button><button class="key operator" data-science="op:-">−</button><button class="key" data-science="ans">ANS</button></div>
-  <div class="science-row"><button class="key" data-science="digit:1">1</button><button class="key" data-science="digit:2">2</button><button class="key" data-science="digit:3">3</button><button class="key operator" data-science="op:+">+</button><button class="key utility" data-science="sign">+/−</button></div>
-  <div class="science-row"><button class="key" data-science="digit:0">0</button><button class="key" data-science="decimal">.</button><button class="key utility" data-science="exp">EXP</button><button class="key equals" data-science="equals">=</button><button class="key" data-science="noop" aria-hidden="true" tabindex="-1"> </button></div>
-</div>
-<div class="home-indicator" aria-hidden="true"></div>
-</section>
+<main class="game-shell">
+  <canvas id="game" aria-label="Endless runner game. Swipe or use arrow keys to move, jump and slide."></canvas>
+  <header class="hud">
+    <div class="brand"><span class="brand-mark">CR</span><span>COASTAL <b>RUSH</b></span></div>
+    <div class="stats"><div><small>DISTANCE</small><strong id="distance">0 m</strong></div><div><small>COINS</small><strong id="coins">0</strong></div></div>
+    <button id="sound" class="icon-button" aria-label="Toggle sound">♫</button>
+  </header>
+  <div class="mission"><span class="live-dot"></span> OCEAN LINE <span class="mission-divider">/</span> EXPRESS 07</div>
+  <section class="start-screen" id="startScreen">
+    <div class="eyebrow">THE COAST IS YOURS</div>
+    <h1>Run beyond<br><em>the horizon.</em></h1>
+    <p>Dodge freight trains, leap over barriers and race beside a giant cargo ship.</p>
+    <button id="play" class="primary-button">START RUN <span>→</span></button>
+    <div class="controls-note">← → MOVE <i>•</i> ↑ JUMP <i>•</i> ↓ SLIDE</div>
+  </section>
+  <section class="pause-screen hidden" id="pauseScreen">
+    <div class="eyebrow">TAKE A BREATHER</div><h2>PAUSED</h2>
+    <button id="resume" class="primary-button">RESUME RUN <span>→</span></button>
+  </section>
+  <section class="game-over hidden" id="gameOver">
+    <div class="eyebrow">END OF THE LINE</div><h2>RUN COMPLETE</h2>
+    <div class="final-score"><small>YOUR DISTANCE</small><strong id="finalDistance">0 m</strong></div>
+    <div class="final-score"><small>COINS COLLECTED</small><strong id="finalCoins">0</strong></div>
+    <button id="restart" class="primary-button">RUN AGAIN <span>↻</span></button>
+  </section>
+  <div class="game-actions hidden" id="gameActions">
+    <button id="pause" class="icon-button" aria-label="Pause game">Ⅱ</button>
+  </div>
+  <div class="touch-hint" id="touchHint">SWIPE TO MOVE <span>↑ JUMP</span></div>
+  <footer class="footer"><span>PRK GAMES</span><span>COASTAL RAILWAY • 2026</span></footer>
 </main>
-<script defer src="js/app.js"></script>
-<script defer src="js/scientific.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/input.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
