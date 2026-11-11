@@ -6,15 +6,77 @@
  function box(parent,w,h,d,material,x=0,y=0,z=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
  function group(parent,x=0,y=0,z=0){const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);return g}
  function buildPlayer(){
+  // Detailed runner model adapted from the supplied 3D character review.
+  // Keep the skateboard attached to the player so it follows jumps and lane changes.
   player=group(scene);player.position.set(0,0,4);
-  const orange=mat('#d66d4e'),skin=mat('#e9bd99'),navy=mat('#243d55'),dark=mat('#263b48');
-  box(player,.72,.9,.42,orange,0,1.55,0);
-  const head=new THREE.Mesh(new THREE.SphereGeometry(.28,20,16),skin);head.position.set(0,2.22,0);head.castShadow=true;player.add(head);
-  box(player,.62,.13,.5,dark,0,2.47,0);
-  const armGeo=new THREE.CapsuleGeometry(.105,.55,4,8),legGeo=new THREE.CapsuleGeometry(.13,.58,4,8);
-  for(const side of [-1,1]){const arm=new THREE.Mesh(armGeo,skin);arm.position.set(side*.49,1.56,0);arm.rotation.z=side*.25;player.add(arm);playerParts['arm'+side]=arm;
-   const leg=new THREE.Mesh(legGeo,navy);leg.position.set(side*.2,.72,0);player.add(leg);playerParts['leg'+side]=leg;
-   const foot=box(player,.27,.14,.46,dark,side*.2,.25,.1);playerParts['foot'+side]=foot}
+  const body=group(player);playerParts.body=body;
+  const material=(color,roughness=.62,metalness=0)=>mat(color,roughness,metalness);
+  const skin=material(0xc9875d),skinLight=material(0xe2a477),hoodie=material(0x13a8a0),hoodieDark=material(0x08736f),
+   pants=material(0x263653),pantsHi=material(0x354968),white=material(0xf2f3ef),sole=material(0xe4e6e8),
+   black=material(0x111927),iris=material(0x4a9bd6,.32),pupil=material(0x101722,.2),
+   cap=material(0xf0b52e),capDark=material(0xd78a1b),boardTop=material(0x192c49),boardEdge=material(0x08c5b5,.35,.25),
+   wheelMat=material(0x202a38,.82),metal=material(0x9daab9,.3,.72),lace=material(0xffffff);
+  const sphere=(parent,material,pos,scale)=>{const m=new THREE.Mesh(new THREE.SphereGeometry(1,24,18),material);m.position.set(...pos);m.scale.set(...scale);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m};
+  const capsule=(parent,material,a,b,radius)=>{const from=new THREE.Vector3(...a),to=new THREE.Vector3(...b),dir=to.clone().sub(from);const m=new THREE.Mesh(new THREE.CapsuleGeometry(radius,Math.max(.01,dir.length()-radius*2),5,12),material);m.position.copy(from.add(to).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());m.castShadow=true;m.receiveShadow=true;parent.add(m);return m};
+  const cylinder=(parent,material,pos,rt,rb,height,rot=[0,0,0])=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,height,20),material);m.position.set(...pos);m.rotation.set(...rot);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m};
+  const partBox=(parent,material,pos,size)=>box(parent,size[0],size[1],size[2],material,pos[0],pos[1],pos[2]);
+
+  const board=group(player,0,.25,0);playerParts.board=board;
+  const deck=new THREE.Mesh(new THREE.BoxGeometry(1.55,.12,.48,4,1,2),boardTop);deck.position.set(0,0,0);deck.rotation.z=.025;deck.castShadow=true;deck.receiveShadow=true;board.add(deck);
+  partBox(board,boardEdge,[0,-.065,0],[1.52,.025,.46]);
+  for(const x of [-.48,.48]){
+   partBox(board,metal,[x,-.13,0],[.12,.08,.34]);
+   for(const z of [-.29,.29]){const w=cylinder(board,wheelMat,[x,-.18,z],.105,.105,.075,[Math.PI/2,0,0]);cylinder(board,metal,[x,-.18,z],.035,.035,.079,[Math.PI/2,0,0])}
+  }
+  for(let i=0;i<3;i++)partBox(board,material(i===1?0xffc14a:0x08c5b5,.4),[-.38+i*.38,.067,0],[.22,.012,.32]);
+
+  // Pivoted legs and fully detailed sneakers.
+  function shoe(parent){
+   const g=group(parent,0,-.70,.16);
+   partBox(g,sole,[0,-.015,.13],[.39,.16,.62]);partBox(g,white,[0,.09,.13],[.36,.19,.58]);
+   sphere(g,white,[0,.12,.34],[.18,.12,.16]);partBox(g,material(0xf0524b),[0,.195,.16],[.34,.045,.22]);
+   partBox(g,white,[0,.22,.08],[.13,.07,.24]);
+   for(let i=0;i<3;i++){const z=.0+i*.075;const laceBar=partBox(g,lace,[0,.26,z],[.20,.018,.025]);laceBar.rotation.y=(i%2?-.18:.18);sphere(g,metal,[-.105,.245,z],[.018,.018,.018]);sphere(g,metal,[.105,.245,z],[.018,.018,.018])}
+   partBox(g,material(0x16b8aa),[0,-.105,.13],[.37,.035,.59]);
+  }
+  for(const side of [-1,1]){
+   const leg=group(body,side*.22,1.12,0);playerParts['leg'+side]=leg;
+   capsule(leg,side<0?pants:pantsHi,[0,0,0],[side*.05,-.50,.03],.16);
+   sphere(leg,pants,[side*.05,-.50,.03],[.16,.17,.17]);
+   const foot=group(leg,0,-.02,0);playerParts['foot'+side]=foot;shoe(foot);
+  }
+
+  // Hoodie torso and articulated sleeves.
+  partBox(body,hoodie,[0,1.62,0],[.72,.82,.42]);
+  partBox(body,hoodieDark,[0,1.23,0],[.52,.13,.43]);
+  partBox(body,material(0x0b7774),[0,1.52,.218],[.25,.25,.018]);
+  for(const side of [-1,1]){
+   const arm=group(body,side*.34,1.9,0);playerParts['arm'+side]=arm;
+   capsule(arm,hoodie,[0,0,0],[side*.19,-.45,.03],.13);
+   sphere(arm,hoodie,[side*.19,-.45,.03],[.14,.15,.14]);
+   capsule(arm,skinLight,[side*.19,-.47,.04],[side*.21,-.62,.12],.085);
+   sphere(arm,skinLight,[side*.21,-.63,.12],[.09,.10,.09]);
+  }
+  for(const side of [-1,1])capsule(body,white,[side*.055,1.88,.222],[side*.07,1.55,.235],.012);
+  cylinder(body,skin,[0,2.08,0],.12,.13,.22);
+
+  sphere(body,skinLight,[0,2.48,0],[.43,.52,.37]);
+  for(const side of [-1,1])sphere(body,skin,[side*.42,2.48,0],[.09,.13,.09]);
+  sphere(body,black,[0,2.79,-.015],[.43,.23,.38]);
+  sphere(body,cap,[0,2.88,-.015],[.44,.18,.39]);
+  partBox(body,capDark,[0,2.78,.20],[.54,.07,.32]);
+  const brim=cylinder(body,cap,[0,2.79,.22],.32,.42,.055,[Math.PI/2,0,0]);
+  partBox(body,white,[0,2.89,.36],[.18,.10,.025]);
+  for(const side of [-1,1]){
+   sphere(body,white,[side*.16,2.52,.323],[.115,.145,.055]);
+   sphere(body,iris,[side*.145,2.515,.371],[.064,.085,.026]);
+   sphere(body,pupil,[side*.14,2.515,.392],[.034,.052,.016]);
+   sphere(body,white,[side*.125,2.55,.407],[.018,.022,.01]);
+   capsule(body,black,[side*.25,2.68,.32],[side*.08,2.70,.34],.025);
+  }
+  sphere(body,skin,[0,2.40,.37],[.055,.07,.06]);
+  const smile=new THREE.Mesh(new THREE.TorusGeometry(.09,.012,8,20,Math.PI),black);smile.position.set(0,2.32,.355);smile.rotation.z=Math.PI;body.add(smile);
+  sphere(body,hoodieDark,[0,2.02,-.23],[.29,.27,.18]);
  }
  function buildShip(){
   ship=group(scene,16,-.05,-26);ship.rotation.y=-.13;
@@ -65,7 +127,7 @@
   const laneTarget=laneX(state.lanePosition);player.position.x+=(laneTarget-player.position.x)*.22;player.position.y=state.jumpY;
   player.rotation.z+=(state.lanePosition-(Math.round(state.lanePosition)))*-.06;
   const running=state.running&&!state.paused&&!state.over;
-  if(running){const gait=t*13;playerParts['leg1'].rotation.x=Math.sin(gait)*.72;playerParts['leg-1'].rotation.x=Math.sin(gait+Math.PI)*.72;playerParts['arm1'].rotation.x=Math.sin(gait+Math.PI)*.62;playerParts['arm-1'].rotation.x=Math.sin(gait)*.62;playerParts['foot1'].rotation.x=playerParts['leg1'].rotation.x*.35;playerParts['foot-1'].rotation.x=playerParts['leg-1'].rotation.x*.35}
+  if(running){const gait=t*13;playerParts['body'].position.y=.025*Math.sin(gait*2);playerParts['body'].rotation.z=.018*Math.sin(gait);playerParts['leg1'].rotation.x=Math.sin(gait)*.48;playerParts['leg-1'].rotation.x=Math.sin(gait+Math.PI)*.48;playerParts['arm1'].rotation.x=Math.sin(gait+Math.PI)*.42;playerParts['arm-1'].rotation.x=Math.sin(gait)*.42;playerParts['foot1'].rotation.x=playerParts['leg1'].rotation.x*.3;playerParts['foot-1'].rotation.x=playerParts['leg-1'].rotation.x*.3}else{playerParts['body'].position.y=0;}
   if(state.sliding){player.scale.y+=(.48-player.scale.y)*.25;player.position.y=0}else player.scale.y+=(1-player.scale.y)*.2;
   track.forEach((tie,i)=>{tie.position.z= -((i*3.5+t*state.speed*1.5)%145)-2});
   if(ship){ship.position.z=-26+Math.sin(t*.18)*1.3;ship.position.y=-.05+Math.sin(t*1.1)*.08;ship.rotation.y=-.13+Math.sin(t*.22)*.025}
