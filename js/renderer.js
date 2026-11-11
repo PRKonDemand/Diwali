@@ -49,6 +49,7 @@
  }
  function makeObject(o){
   const g=group(scene,laneX(o.lane),0,o.z);const metal=mat('#394b55'),yellow=mat('#e5a34f'),red=mat('#b94f3d'),glass=mat('#63929a'),cream=mat('#e6d6b7');
+  if(o.type==='magnet'){const magnet=group(g,0,1.35,0);const ring=new THREE.Mesh(new THREE.TorusGeometry(.34,.11,10,24),new THREE.MeshStandardMaterial({color:'#75e7d1',metalness:.45,roughness:.2,emissive:'#176b65',emissiveIntensity:.65}));magnet.add(ring);const bar=box(magnet,.16,.82,.18,yellow,0,0,0);bar.rotation.z=Math.PI/2;box(magnet,.48,.14,.18,cream,0,.34,0);return {group:g,magnet}}
   if(o.type==='coin'){const coin=new THREE.Mesh(new THREE.TorusGeometry(.42,.12,10,24),new THREE.MeshStandardMaterial({color:'#ffc957',metalness:.75,roughness:.22,emissive:'#6c3e08',emissiveIntensity:.25}));coin.position.y=1.3;g.add(coin);const stem=box(g,.08,.4,.08,yellow,0,1.3,0);return {group:g,coin}}
   if(o.type==='barrier'){box(g,2.1,.95,.48,yellow,0,.48,0);for(let i=-1;i<=1;i++)box(g,.35,.97,.5,red,i*.65,.48,.02);box(g,2.4,.16,.65,metal,0,.05,0)}
   else if(o.type==='overhead'){box(g,2.55,.48,.48,yellow,0,2.05,0);box(g,.2,2,.25,metal,-1.12,1,0);box(g,.2,2,.25,metal,1.12,1,0);box(g,1.1,.05,.5,cream,0,1.72,.03)}
@@ -59,7 +60,7 @@
  function draw(state,t){
   if(!renderer)return;clock=t;
   const live=new Set();
-  state.objects.forEach(o=>{live.add(o.id);let item=objects.get(o.id);if(!item){item=makeObject(o);objects.set(o.id,item)}item.group.position.x+=(laneX(o.lane)-item.group.position.x)*.24;item.group.position.z=o.z;if(item.coin){item.coin.rotation.y=t*3+o.spin;item.coin.position.y=1.35+Math.sin(t*4+o.z)*.12}});
+  state.objects.forEach(o=>{live.add(o.id);let item=objects.get(o.id);if(!item){item=makeObject(o);objects.set(o.id,item)}item.group.position.x+=(laneX(o.lane)-item.group.position.x)*.24;item.group.position.z=o.z;if(item.coin){item.coin.rotation.y=t*3+o.spin;item.coin.position.y=1.35+Math.sin(t*4+o.z)*.12}if(item.magnet){item.magnet.rotation.y=t*2.5;item.magnet.position.y=1.35+Math.sin(t*5+o.z)*.15}});
   for(const [id,item] of objects){if(!live.has(id)){scene.remove(item.group);item.group.traverse(n=>{if(n.geometry)n.geometry.dispose()});objects.delete(id)}}
   const laneTarget=laneX(state.lanePosition);player.position.x+=(laneTarget-player.position.x)*.22;player.position.y=state.jumpY;
   player.rotation.z+=(state.lanePosition-(Math.round(state.lanePosition)))*-.06;
