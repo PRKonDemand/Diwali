@@ -26,7 +26,7 @@
     const trainLength=state.speed*2.6;
     const distanceAlongCarriage=state.ridingTimer*state.speed;
     const trainRearEdge=distanceAlongCarriage-trainLength;
-    const trainEdgePassed=trainRearEdge>=-trainLength;
+    const trainEdgePassed=trainRearEdge>=0;
     if(trainEdgePassed){
      state.ridingTrainId=null;
      state.falling=true;
