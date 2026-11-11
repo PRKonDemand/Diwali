@@ -35,7 +35,7 @@
   for(const o of state.objects){
    if(o.hit||o.z<2.6||o.z>4.9||Math.abs(o.lane-state.lanePosition)>.36)continue;
    if(o.type==='coin'){collectCoin(o);continue}
-   if(o.type==='magnet'){o.hit=true;state.magnetTimer=8;window.GameUI?.magnet(8);window.GameSound?.powerup();continue}
+   if(o.type==='magnet'){o.hit=true;state.magnetTimer=10;window.GameUI?.magnet(10);window.GameSound?.powerup();continue}
    if(o.type==='train'){
     if(state.jumpTimer>0&&state.jumpTimer/1.02>.5&&state.jumpY>=2.45){state.jumpTimer=0;state.ridingTrainId=o.id;state.ridingTimer=2.6;state.jumpY=2.65;window.GameSound?.land();continue}
     if(state.ridingTrainId===o.id)continue;
