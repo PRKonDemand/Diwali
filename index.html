@@ -3,183 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f3">
-<meta name="description" content="A clean, simple calculator.">
-<title>Calc</title>
+<meta name="theme-color" content="#080b12">
+<title>WallVision — TV Visualizer</title>
 <style>
-:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;font-synthesis:none;color-scheme:light;--page:#f1f1f2;--shell:#fff;--pad:#f7f7f8;--key:#f4f4f5;--key-active:#e9e9eb;--ink:#17191f;--muted:#8b8d94;--line:rgba(0,0,0,.045);--cyan:#00cfc4;--red:#f04444;--toggle:#f3f3f5;--shadow:0 28px 70px rgba(20,20,30,.10)}
-*{box-sizing:border-box}
-html,body{width:100%;height:100%;min-width:280px;margin:0;overflow:hidden;overscroll-behavior:none}
-body{background:var(--page);color:var(--ink);display:grid;place-items:center;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:background .25s,color .25s}
-body.dark{color-scheme:dark;--page:#202229;--shell:#22252d;--pad:#272a33;--key:#242730;--key-active:#333742;--ink:#f7f7f8;--muted:#858992;--line:rgba(255,255,255,.035);--toggle:#292c35;--shadow:0 28px 70px rgba(0,0,0,.24)}
-.app{position:relative;width:min(100vw,430px);height:min(100dvh,820px);min-height:500px;background:var(--shell);border-radius:30px;overflow:hidden;display:grid;grid-template-rows:42% 58%;box-shadow:var(--shadow);transition:background .25s}
-
-.top{position:relative;display:flex;flex-direction:column;align-items:center;padding:28px 26px 20px;min-height:0}
-.status{width:100%;display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:650;letter-spacing:-.02em;color:var(--ink)}
-.status-right{display:flex;align-items:center;gap:4px}
-.status svg{width:14px;height:12px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.theme-switch{margin-top:12px;display:flex;align-items:center;padding:4px;gap:3px;background:var(--toggle);border-radius:16px}
-.theme-switch button{width:32px;height:27px;border:0;border-radius:12px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
-.theme-switch button.active{color:var(--ink);background:var(--shell)}
-.theme-switch svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.readout{width:100%;margin-top:auto;text-align:right;padding:0 0 4px;overflow:hidden}
-.expression{min-height:23px;font-size:15px;font-weight:500;letter-spacing:.08em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
-.expression .op{color:var(--red);padding:0 3px}
-.result{font-size:clamp(36px,10vw,43px);line-height:1.15;font-weight:650;letter-spacing:-.045em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
-.keypad{background:var(--pad);border-radius:30px 30px 0 0;padding:20px 19px 25px;display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:9px;min-height:0}
-.keyrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-height:0}
-.key{border:0;border-radius:13px;background:var(--key);color:var(--ink);font-family:inherit;font-size:17px;font-weight:500;line-height:1;display:grid;place-items:center;cursor:pointer;min-width:0;min-height:0;transition:background .13s,transform .13s}
-.key:active{background:var(--key-active);transform:scale(.94)}
-.key:focus-visible,.theme-switch button:focus-visible{outline:2px solid var(--muted);outline-offset:2px}
-.key.utility{color:var(--cyan);font-size:15px;font-weight:600}
-.key.operator{color:var(--red);font-size:22px;font-weight:500}
-.key.equals{color:var(--red);font-size:22px;font-weight:500}
-.key svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.home-indicator{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:94px;height:4px;border-radius:9px;background:var(--muted);opacity:.28}
-.keypad-wrap{position:relative;min-height:0}
-@media(min-width:600px){.app{height:min(92dvh,790px);border-radius:30px}.top{padding-top:28px}}
-@media(max-height:620px) and (min-width:601px){.app{height:100dvh;min-height:0;border-radius:0;grid-template-rows:39% 61%}.top{padding:16px 22px 12px}.keypad{padding:13px 14px 19px;gap:6px}.keyrow{gap:7px}.key{border-radius:10px}.home-indicator{bottom:7px}}
-@media(max-width:360px){.app{border-radius:0}.keypad{padding-left:13px;padding-right:13px}.keyrow{gap:7px}}
-
-/* Portrait-first mobile layout: use the entire phone screen, not a desktop card. */
-@media (max-width:600px) and (orientation:portrait){
- body{display:block;width:100%;height:100%;min-height:0}
- .app{width:100%;height:100dvh;min-height:0;max-height:none;margin:0;border-radius:0;box-shadow:none;grid-template-rows:minmax(0,36%) minmax(0,64%)}
- .top{padding:calc(env(safe-area-inset-top) + 14px) 24px 14px}
- .status{font-size:11px}
- .theme-switch{margin-top:12px}
- .theme-switch button{width:36px;height:30px}
- .readout{padding-bottom:5px}
- .expression{font-size:clamp(14px,4vw,17px)}
- .result{font-size:clamp(44px,13vw,64px);line-height:1.06}
- .keypad{padding:16px 16px calc(env(safe-area-inset-bottom) + 20px);gap:10px;border-radius:25px 25px 0 0}
- .keyrow{gap:10px}
- .key{border-radius:15px;font-size:clamp(20px,5.8vw,25px)}
- .key.utility{font-size:clamp(16px,4.4vw,19px)}
- .key.operator,.key.equals{font-size:26px}
- .key svg{width:22px;height:22px}
- .home-indicator{display:none}
-}
-@media (max-width:600px) and (orientation:portrait) and (max-height:650px){
- .app{grid-template-rows:minmax(0,32%) minmax(0,68%)}
- .top{padding-top:calc(env(safe-area-inset-top) + 8px);padding-bottom:8px}
- .theme-switch{margin-top:7px}
- .keypad{padding-top:10px;padding-bottom:calc(env(safe-area-inset-bottom) + 12px);gap:6px}
- .keyrow{gap:7px}
-}
-/* Correct full-height portrait phone layout */
-@media (max-width:600px) and (orientation:portrait){
- html,body{height:100%;min-height:0}
- body{display:block}
- .app{
-  width:100%;height:100dvh;height:100svh;min-height:0;max-height:none;
-  margin:0;border-radius:0;box-shadow:none;
-  grid-template-rows:minmax(0,34%) minmax(0,66%);
- }
- .top{padding:calc(env(safe-area-inset-top) + 12px) 25px 14px}
- .theme-switch{margin-top:0;align-self:flex-start}
- .theme-switch button{width:36px;height:30px}
- .readout{margin-top:auto;padding:0 0 8px}
- .expression{font-size:clamp(14px,4vw,17px)}
- .result{font-size:clamp(48px,14vw,66px);line-height:1.05}
- .keypad-wrap{height:100%;min-height:0}
- .keypad{
-  height:100%;min-height:0;grid-template-rows:repeat(5,minmax(0,1fr));
-  padding:14px 16px calc(env(safe-area-inset-bottom) + 16px);
-  gap:9px;border-radius:26px 26px 0 0;
- }
- .keyrow{min-height:0;gap:9px}
- .key{height:100%;min-height:0;border-radius:18px;font-size:clamp(21px,6vw,26px)}
- .key.utility{font-size:clamp(16px,4.5vw,19px)}
- .key.operator,.key.equals{font-size:27px}
- .key svg{width:22px;height:22px}
- .home-indicator{display:none}
-}
-@media (max-width:600px) and (orientation:portrait) and (max-height:680px){
- .app{grid-template-rows:minmax(0,30%) minmax(0,70%)}
- .top{padding-top:calc(env(safe-area-inset-top) + 8px);padding-bottom:8px}
- .keypad{padding-top:10px;padding-bottom:calc(env(safe-area-inset-bottom) + 10px);gap:6px}
- .keyrow{gap:7px}
-}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
-
-/* Feature controls and panels */
-.top-tools{width:100%;display:flex;align-items:center;justify-content:space-between}
-.tool-btn{width:38px;height:38px;border:0;border-radius:13px;background:var(--toggle);color:var(--ink);display:grid;place-items:center;cursor:pointer}
-.tool-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.tool-btn.whatsapp-btn{background:#fff;border:1px solid rgba(0,0,0,.09)}
-.tool-btn.whatsapp-btn svg{width:21px;height:21px;fill:#000;stroke:none}
-.panel{position:absolute;inset:0;z-index:5;background:var(--shell);padding:calc(env(safe-area-inset-top) + 18px) 20px 20px;display:none;flex-direction:column;gap:14px;overflow:auto}
-.panel.open{display:flex}
-.panel-head{display:flex;align-items:center;justify-content:space-between;font-size:19px;font-weight:650}
-.panel-list{display:flex;flex-direction:column;gap:8px}
-.history-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;border-radius:13px;background:var(--pad);font-variant-numeric:tabular-nums}
-.history-item button{border:0;background:transparent;color:var(--ink);font:inherit;text-align:right}
-.history-item small{display:block;color:var(--muted);font-size:12px}
-.panel-action{border:0;border-radius:12px;padding:11px 14px;background:var(--key);color:var(--ink);font:inherit}
-.theme-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.theme-option{padding:14px;border:2px solid transparent;border-radius:14px;background:var(--pad);color:var(--ink);font:inherit;text-align:left}
-.theme-option[aria-pressed=true]{border-color:var(--cyan)}
-.theme-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:-1px}
-body[data-theme="midnight"]{--page:#101216;--shell:#191c22;--pad:#222630;--key:#2c313d;--key-active:#3a4150;--ink:#f5f6f8;--muted:#9ba3b1;--cyan:#75d8ce;--red:#ff858b;--toggle:#272c36;--shadow:0 28px 70px rgba(0,0,0,.3)}
-body[data-theme="mint"]{--page:#e8f1ed;--shell:#f8fffb;--pad:#edf7f1;--key:#e0eee6;--key-active:#cfe3d7;--ink:#18342b;--muted:#71877c;--cyan:#168f79;--red:#d45d62;--toggle:#e6f2eb;--shadow:0 28px 70px rgba(20,60,40,.10)}
-body[data-theme="lavender"]{--page:#eeeaf5;--shell:#fcfaff;--pad:#f3eff9;--key:#e9e2f2;--key-active:#dcd1e9;--ink:#292238;--muted:#89819a;--cyan:#8b69c6;--red:#d65c79;--toggle:#eee8f6;--shadow:0 28px 70px rgba(50,30,70,.10)}
-@media(max-width:600px) and (orientation:portrait){.top-tools{width:100%}.tool-btn{width:36px;height:36px}}
-
+:root{color-scheme:dark;--bg:#080b12;--panel:#111722;--panel2:#182231;--line:#283447;--muted:#98a6b9;--text:#f5f7fb;--accent:#8ab4ff;--accent2:#b8d2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{border:0;cursor:pointer;color:inherit}.app{max-width:760px;margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 16px calc(22px + env(safe-area-inset-bottom))}.top{height:64px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:750;letter-spacing:-.5px;font-size:19px}.brand span{color:var(--accent)}.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);padding:5px 9px;border-radius:20px}.intro{padding:8px 0 18px}.intro h1{font-size:clamp(27px,6vw,38px);line-height:1.08;letter-spacing:-1.2px;margin:0 0 9px}.intro p{color:var(--muted);margin:0;max-width:540px}.stage{position:relative;aspect-ratio:4/5;max-height:66dvh;min-height:360px;background:#111923;border:1px solid var(--line);border-radius:24px;overflow:hidden;isolation:isolate}.stage video,.stage .camera-placeholder{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.camera-placeholder{display:grid;place-content:center;text-align:center;padding:28px;background:radial-gradient(ellipse at 50% 38%,#26364b,#111923 65%)}.camera-placeholder .cam-icon{font-size:42px;margin-bottom:12px}.camera-placeholder p{color:#bac7d8;max-width:270px;margin:6px auto}.stage video{display:none}.stage.live video{display:block}.stage.live .camera-placeholder{display:none}.stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#0005,transparent 22%,transparent 78%,#0007);z-index:2}.stage-top{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}.status{background:#080b12b8;border:1px solid #ffffff24;border-radius:20px;padding:7px 10px;font-size:11px;backdrop-filter:blur(12px)}.tv{position:absolute;z-index:4;width:72%;aspect-ratio:16/9;left:14%;top:38%;transform:translateY(-50%);touch-action:none;filter:drop-shadow(0 12px 18px #0009);cursor:grab;user-select:none}.tv-frame{width:100%;height:100%;background:linear-gradient(145deg,#252a32,#050608 40%,#101318);border:clamp(3px,.8vw,7px) solid #080a0d;border-radius:5px;box-shadow:inset 0 0 0 1px #69717c,0 0 0 1px #ffffff24;position:relative;overflow:hidden}.tv-screen{position:absolute;inset:2px;background:radial-gradient(ellipse at 50% 45%,#284b73,#101c31 58%,#080e18);display:grid;place-items:center;overflow:hidden}.tv-screen:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#ffffff18,transparent 35%,#0004)}.screen-art{text-align:center;z-index:1}.screen-art b{font-size:clamp(13px,4vw,28px);letter-spacing:2px}.screen-art small{display:block;font-size:9px;letter-spacing:3px;color:#c2d9f8;margin-top:3px}.tv-led{position:absolute;bottom:-5px;left:50%;width:3px;height:3px;border-radius:50%;background:#8ab4ff;box-shadow:0 0 7px #8ab4ff}.tv-label{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;background:#080b12d9;border:1px solid #ffffff30;padding:5px 9px;border-radius:20px;color:white}.crosshair{position:absolute;z-index:3;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%);opacity:.55;pointer-events:none}.crosshair:before,.crosshair:after{content:"";position:absolute;background:white}.crosshair:before{width:1px;height:24px;left:12px}.crosshair:after{height:1px;width:24px;top:12px}.stage-help{position:absolute;z-index:5;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#080b12b8;border:1px solid #ffffff25;border-radius:20px;padding:7px 11px;font-size:11px;color:#e6edf7}.actions{display:flex;gap:9px;margin:13px 0}.btn{flex:1;padding:13px 12px;border-radius:14px;background:var(--panel2);font-weight:650}.btn.primary{background:#dce9ff;color:#0a1423}.btn:disabled{opacity:.45}.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:13px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}.panel h2{font-size:16px;margin:0;letter-spacing:-.2px}.sub{font-size:12px;color:var(--muted)}.sizes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.size{padding:11px 4px;border-radius:12px;background:#1a2432;border:1px solid transparent;font-weight:700}.size small{display:block;font-size:10px;color:var(--muted);font-weight:500}.size.active{border-color:var(--accent);background:#20334d;color:#d8e7ff}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}.field input,.field select{width:100%;background:#0b111b;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}.field input:focus{border-color:var(--accent)}.measure-note{font-size:12px;color:var(--muted);margin:11px 0 0}.measure-value{font-weight:700;color:var(--accent2)}.range{width:100%;accent-color:var(--accent)}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.metric{background:#0b111b;border-radius:12px;padding:11px}.metric small{display:block;color:var(--muted);font-size:10px}.metric b{font-size:14px}.notice{font-size:12px;color:var(--muted);line-height:1.5;margin:12px 2px 0}.toast{position:fixed;z-index:20;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,20px);opacity:0;transition:.2s;background:#e6efff;color:#101827;padding:10px 15px;border-radius:20px;font-size:13px;font-weight:650;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}.hidden{display:none!important}
+@media(min-width:620px){.stage{aspect-ratio:16/10;max-height:520px}.tv{width:58%;left:21%}.intro{padding-top:15px}}
 </style>
 </head>
 <body>
-<main class="app" aria-label="Calculator">
-<section class="top">
-  <div class="top-tools"><div class="theme-switch" role="group" aria-label="Appearance">
-    <button id="lightMode" class="active" aria-label="Light mode" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
-    <button id="darkMode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.7 8.7 0 1 0 20.5 14.2Z"/></svg></button>
-  </div><button class="tool-btn" id="historyOpen" aria-label="Calculation history"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></button><button class="tool-btn whatsapp-btn" id="shareWhatsApp" aria-label="Share calculation on WhatsApp" title="Share on WhatsApp"><svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d="M12.04 2a9.85 9.85 0 0 0-8.48 14.87L2.2 22l5.27-1.38A9.95 9.95 0 1 0 12.04 2Zm0 17.98a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.13.82.84-3.05-.2-.31A8.13 8.13 0 1 1 12.04 20Zm4.46-6.08c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.46-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.15 1.52.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg></button><button class="tool-btn" id="themesOpen" aria-label="Choose theme"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.8 1.8 0 0 1 1.3-3.1H18a3 3 0 0 0 3-3c0-4.7-4-8.5-9-8.5Z"/><path d="M7.5 10h.01M10 7h.01M15 7.5h.01"/></svg></button></div>
-  <div class="readout"><div class="expression" id="previous" aria-live="polite"></div><div class="result" id="current">0</div></div>
+<main class="app">
+<header class="top"><div class="brand">WALL<span>VISION</span></div><div class="tag">TV SIZE PREVIEW</div></header>
+<section class="intro"><h1>See it on your wall<br>before you buy it.</h1><p>Use your camera to preview a life-size TV overlay. Calibrate the wall for a more accurate size comparison.</p></section>
+<section class="stage" id="stage" aria-label="Live camera preview">
+<video id="camera" autoplay playsinline muted></video>
+<div class="camera-placeholder" id="placeholder"><div><div class="cam-icon">▣</div><strong>Your wall, reimagined.</strong><p>Start the camera, point it at a clear wall, then place your virtual TV.</p></div></div>
+<div class="stage-top"><span class="status" id="cameraStatus">CAMERA OFF</span><span class="status">LIVE PREVIEW</span></div>
+<div class="crosshair"></div>
+<div class="tv" id="tv" aria-label="Drag to position virtual TV"><div class="tv-frame"><div class="tv-screen"><div class="screen-art"><b>WALLVISION</b><small>YOUR SPACE · YOUR SIZE</small></div></div></div><i class="tv-led"></i><div class="tv-label" id="tvLabel">43″ TV · 95.2 × 53.5 cm</div></div>
+<div class="stage-help" id="stageHelp">Drag the TV to position it</div>
 </section>
-<section class="panel" id="historyPanel" aria-label="Calculation history"><div class="panel-head"><span>History</span><button class="tool-btn" data-close="historyPanel" aria-label="Close history">×</button></div><div class="panel-list" id="historyList"></div><button class="panel-action" id="clearHistory">Clear history</button></section>
-<section class="panel" id="themesPanel" aria-label="Custom themes"><div class="panel-head"><span>Themes</span><button class="tool-btn" data-close="themesPanel" aria-label="Close themes">×</button></div><div class="theme-options"><button class="theme-option" data-theme-choice="light"><span class="theme-dot" style="background:#f1f1f2"></span>Light</button><button class="theme-option" data-theme-choice="dark"><span class="theme-dot" style="background:#22252d"></span>Dark</button><button class="theme-option" data-theme-choice="midnight"><span class="theme-dot" style="background:#101216"></span>Midnight</button><button class="theme-option" data-theme-choice="mint"><span class="theme-dot" style="background:#b9d9c8"></span>Mint</button><button class="theme-option" data-theme-choice="lavender"><span class="theme-dot" style="background:#cfc1e5"></span>Lavender</button></div></section>
-<section class="keypad-wrap" aria-label="Calculator keypad">
-<div class="keypad">
- <div class="keyrow"><button class="key utility" data-action="clear">AC</button><button class="key utility" data-action="sign" aria-label="Change sign">+/−</button><button class="key utility" data-action="percent">%</button><button class="key operator" data-op="÷" aria-label="Divide"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5h.01M12 19h.01"/></svg></button></div>
- <div class="keyrow"><button class="key" data-digit="7">7</button><button class="key" data-digit="8">8</button><button class="key" data-digit="9">9</button><button class="key operator" data-op="×" aria-label="Multiply"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
- <div class="keyrow"><button class="key" data-digit="4">4</button><button class="key" data-digit="5">5</button><button class="key" data-digit="6">6</button><button class="key operator" data-op="−" aria-label="Subtract"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
- <div class="keyrow"><button class="key" data-digit="1">1</button><button class="key" data-digit="2">2</button><button class="key" data-digit="3">3</button><button class="key operator" data-op="+" aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
- <div class="keyrow"><button class="key" data-action="backspace" aria-label="Delete last digit"><svg viewBox="0 0 24 24"><path d="M9 5 3 12l6 7h11V5H9Z"/><path d="m12 9 6 6m0-6-6 6"/></svg></button><button class="key" data-digit="0">0</button><button class="key" data-action="decimal">.</button><button class="key equals" data-action="equals" aria-label="Equals"><svg viewBox="0 0 24 24"><path d="M5 9h14M5 15h14"/></svg></button></div>
-</div><div class="home-indicator" aria-hidden="true"></div>
+<div class="actions"><button class="btn primary" id="cameraBtn">Start camera</button><button class="btn" id="flipBtn" disabled>Flip camera</button></div>
+<section class="panel">
+<div class="panel-head"><h2>Choose TV size</h2><span class="sub">16:9 screen ratio</span></div>
+<div class="sizes" id="sizes">
+<button class="size" data-size="32">32″<small>Compact</small></button><button class="size" data-size="40">40″<small>Small</small></button><button class="size active" data-size="43">43″<small>Popular</small></button><button class="size" data-size="50">50″<small>Large</small></button><button class="size" data-size="55">55″<small>Large</small></button><button class="size" data-size="65">65″<small>Extra large</small></button><button class="size" data-size="75">75″<small>Cinema</small></button><button class="size" data-size="85">85″<small>Max</small></button>
+</div>
+<div class="metric-grid"><div class="metric"><small>TV WIDTH</small><b id="widthMetric">95.2 cm</b></div><div class="metric"><small>TV HEIGHT</small><b id="heightMetric">53.5 cm</b></div><div class="metric"><small>DIAGONAL</small><b id="diagonalMetric">109.2 cm</b></div></div>
 </section>
+<section class="panel">
+<div class="panel-head"><h2>Wall calibration</h2><span class="sub">For real-world scale</span></div>
+<div class="field-row"><div class="field"><label for="wallWidth">Wall width (cm)</label><input id="wallWidth" type="number" min="30" max="2000" value="300" inputmode="decimal"></div><div class="field"><label for="wallHeight">Wall height (cm)</label><input id="wallHeight" type="number" min="30" max="1500" value="240" inputmode="decimal"></div></div>
+<p class="measure-note">In the camera view, set how much of the wall width is visible:</p>
+<input class="range" id="visibleWall" type="range" min="20" max="100" value="85">
+<div class="sub"><span id="visibleLabel">85%</span> of the wall width is visible in the camera frame</div>
+<div class="field" style="margin-top:14px"><label for="placementScale">Preview scale adjustment</label><input class="range" id="placementScale" type="range" min="50" max="150" value="100"></div>
+<p class="measure-note">Estimated TV width: <span class="measure-value" id="scaleReadout">95.2 cm</span>. For best accuracy, keep the phone facing the wall straight-on and calibrate using a measured wall width visible in the frame.</p>
+</section>
+<p class="notice">This is a camera-overlay preview, not yet a persistent spatial AR anchor. The TV stays positioned on your screen as you move the phone. Camera access requires HTTPS and your permission. Actual TV cabinet dimensions vary by model and bezel.</p>
 </main>
+<div class="toast" id="toast"></div>
 <script>
 (()=>{
-const currentEl=document.getElementById('current'),previousEl=document.getElementById('previous');
-let display='0',stored=null,operator=null,waiting=false,justCalculated=false,lastCalculation=null;
-const safeGet=(key,fallback=null)=>{try{return localStorage.getItem(key)??fallback}catch(_){return fallback}};
-const safeSet=(key,value)=>{try{localStorage.setItem(key,value)}catch(_){}};
-const safeRemove=key=>{try{localStorage.removeItem(key)}catch(_){}};
-let history=(()=>{try{const value=JSON.parse(safeGet('calc-history','[]'));return Array.isArray(value)?value.filter(x=>x&&typeof x.expression==='string'&&typeof x.result==='string').slice(0,50):[]}catch(_){return []}})();
-const buzz=()=>{try{if(navigator.vibrate)navigator.vibrate(8)}catch(_){}};
-const saveHistory=(entry)=>{history.unshift(entry);history=history.slice(0,50);safeSet('calc-history',JSON.stringify(history));renderHistory()};
-const renderHistory=()=>{const el=document.getElementById('historyList');el.innerHTML='';if(!history.length){el.textContent='No calculations yet';return}history.forEach((item,i)=>{const row=document.createElement('div');row.className='history-item';const left=document.createElement('div');left.textContent=item.expression;const right=document.createElement('button');right.innerHTML='';right.textContent=item.result;right.addEventListener('click',()=>{display=item.result.replace(/,/g,'');stored=null;operator=null;waiting=false;justCalculated=false;lastCalculation={expression:item.expression,result:item.result};previousEl.textContent=item.expression;render();closePanels()});row.append(left,right);el.append(row)})};
-const closePanels=()=>document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
-const pretty=v=>{if(!Number.isFinite(v))return'Error';return String(Number.parseFloat(v.toPrecision(11)))};
-const format=v=>{if(v==='Error'||/[eE]/.test(v))return v;const parts=v.split('.');const sign=parts[0].startsWith('-')?'-':'';const digits=sign?parts[0].slice(1):parts[0];return sign+digits.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(parts.length>1?'.'+parts[1]:'')};
-const render=()=>{currentEl.textContent=format(display)};
-const renderExpression=(a,op,b='')=>{previousEl.innerHTML='';const text=document.createElement('span');text.textContent=a+' ';previousEl.append(text);const symbol=document.createElement('span');symbol.className='op';symbol.textContent=op;previousEl.append(symbol);if(b){const tail=document.createElement('span');tail.textContent=' '+b;previousEl.append(tail)}};
-const inputDigit=d=>{if(display==='Error'||waiting||justCalculated){display=d;waiting=false;justCalculated=false}else if(display.replace('-','').length<14)display=display==='0'?d:display+d;render()};
-const calculate=(a,b,op)=>({'+':a+b,'−':a-b,'×':a*b,'÷':b===0?NaN:a/b}[op]);
-const chooseOperator=next=>{if(display==='Error')return;const value=Number(display);if(operator&&!waiting){stored=calculate(stored,value,operator);display=pretty(stored);render()}else if(stored===null||!operator)stored=value;operator=next;waiting=true;justCalculated=false;renderExpression(format(pretty(stored)),next)};
-const equals=()=>{if(!operator||stored===null||waiting||display==='Error')return;const a=stored,b=Number(display),op=operator;const expression=format(pretty(a))+' '+op+' '+format(pretty(b));display=pretty(calculate(a,b,op));lastCalculation={expression,result:format(display)};saveHistory({expression,result:format(display),time:Date.now()});renderExpression(format(pretty(a)),op,format(pretty(b))+' =');stored=null;operator=null;waiting=true;justCalculated=true;render()};
-const clear=()=>{display='0';stored=null;operator=null;waiting=false;justCalculated=false;previousEl.textContent='';render()};
-const act=a=>{if(a==='clear')return clear();if(display==='Error')return clear();if(a==='decimal'){if(waiting||justCalculated){display='0.';waiting=false;justCalculated=false}else if(!display.includes('.'))display+='.'}if(a==='sign'&&Number(display)!==0)display=display.startsWith('-')?display.slice(1):'-'+display;if(a==='percent')display=pretty(Number(display)/100);if(a==='backspace'&&!waiting&&!justCalculated){display=display.length>1?display.slice(0,-1):'0';if(display==='-')display='0'}render()};
-document.querySelector('.keypad').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;buzz();if(b.dataset.digit!==undefined)inputDigit(b.dataset.digit);else if(b.dataset.op)chooseOperator(b.dataset.op);else if(b.dataset.action==='equals')equals();else act(b.dataset.action)});
-const setTheme=dark=>{document.body.dataset.theme=dark?'dark':'light';document.body.classList.toggle('dark',dark);localStorage.setItem('calc-theme',dark?'dark':'light');document.getElementById('lightMode').classList.toggle('active',!dark);document.getElementById('darkMode').classList.toggle('active',dark);document.getElementById('lightMode').setAttribute('aria-pressed',String(!dark));document.getElementById('darkMode').setAttribute('aria-pressed',String(dark));document.querySelector('meta[name="theme-color"]').content=dark?'#202229':'#f1f1f2'};
-const applyTheme=name=>{if(!['light','dark','midnight','mint','lavender'].includes(name))name='light';document.body.dataset.theme=name;document.body.classList.toggle('dark',['dark','midnight'].includes(name));safeSet('calc-theme',name);const dark=['dark','midnight'].includes(name);document.getElementById('lightMode').classList.toggle('active',!dark);document.getElementById('darkMode').classList.toggle('active',dark);document.getElementById('lightMode').setAttribute('aria-pressed',String(!dark));document.getElementById('darkMode').setAttribute('aria-pressed',String(dark));document.querySelector('meta[name="theme-color"]').content=({light:'#f1f1f2',dark:'#202229',midnight:'#101216',mint:'#e8f1ed',lavender:'#eeeaf5'})[name];document.querySelectorAll('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeChoice===name)))};
-document.getElementById('lightMode').addEventListener('click',()=>applyTheme('light'));document.getElementById('darkMode').addEventListener('click',()=>applyTheme('dark'));
-document.getElementById('historyOpen').addEventListener('click',()=>{renderHistory();document.getElementById('historyPanel').classList.add('open')});
-document.getElementById('shareWhatsApp').addEventListener('click',()=>{const calculation=lastCalculation||{expression:'Current value',result:format(display)};const message='Calculation: '+calculation.expression+'\nResult: '+calculation.result+'\n\nShared from Calc';const url='https://wa.me/?text='+encodeURIComponent(message);window.open(url,'_blank','noopener,noreferrer')});document.getElementById('themesOpen').addEventListener('click',()=>document.getElementById('themesPanel').classList.add('open'));document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).classList.remove('open')));document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click',()=>{applyTheme(b.dataset.themeChoice);closePanels()}));document.getElementById('clearHistory').addEventListener('click',()=>{history=[];safeRemove('calc-history');renderHistory()});
-document.addEventListener('keydown',e=>{if(/^[0-9]$/.test(e.key)){inputDigit(e.key);return}const ops={'+':'+','-':'−','*':'×','/':'÷'};if(ops[e.key]){e.preventDefault();chooseOperator(ops[e.key]);return}if(e.key==='Enter'||e.key==='='){e.preventDefault();equals();return}if(e.key==='.')act('decimal');if(e.key==='Escape')clear();if(e.key==='Backspace'){e.preventDefault();act('backspace')}if(e.key==='%')act('percent')});
-applyTheme(safeGet('calc-theme','light'));renderHistory();render();
+const $=id=>document.getElementById(id);
+const stage=$('stage'),video=$('camera'),tv=$('tv'),cameraBtn=$('cameraBtn'),flipBtn=$('flipBtn');
+let stream=null,facing='environment',diagonal=43,drag=null;
+const dims=d=>({w:d*2.54*0.8,h:d*2.54*0.45});
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2300)}
+function updateSize(){const d=dims(diagonal),w=d.w.toFixed(1),h=d.h.toFixed(1);$('widthMetric').textContent=w+' cm';$('heightMetric').textContent=h+' cm';$('diagonalMetric').textContent=(diagonal*2.54).toFixed(1)+' cm';$('tvLabel').textContent=diagonal+'″ TV · '+w+' × '+h+' cm';$('scaleReadout').textContent=w+' cm';const wall=Number($('wallWidth').value)||300,visible=Number($('visibleWall').value)/100,scale=Number($('placementScale').value)/100;const stageWidth=stage.clientWidth;const visibleCm=wall*visible;const px=stageWidth*(d.w/visibleCm)*scale;tv.style.width=Math.max(24,Math.min(stageWidth*.94,px))+'px';const active=tv.style.width;document.querySelectorAll('.size').forEach(b=>b.classList.toggle('active',Number(b.dataset.size)===diagonal));$('visibleLabel').textContent=$('visibleWall').value+'%'}
+document.querySelectorAll('.size').forEach(b=>b.addEventListener('click',()=>{diagonal=Number(b.dataset.size);updateSize()}));
+['wallWidth','wallHeight','visibleWall','placementScale'].forEach(id=>$(id).addEventListener('input',updateSize));
+async function startCamera(){if(!navigator.mediaDevices?.getUserMedia){toast('Camera is unavailable. Open this page in a supported HTTPS browser.');return}try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:facing},width:{ideal:1920},height:{ideal:1080}}});video.srcObject=stream;await video.play();stage.classList.add('live');$('cameraStatus').textContent='CAMERA LIVE';cameraBtn.textContent='Stop camera';flipBtn.disabled=false;$('stageHelp').textContent='Drag the TV to position it';toast('Camera ready — point it at your wall');}catch(e){toast(e.name==='NotAllowedError'?'Camera permission was denied. Allow camera access in Chrome.':'Could not start camera. Check browser permissions.');}}
+function stopCamera(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;stage.classList.remove('live');$('cameraStatus').textContent='CAMERA OFF';cameraBtn.textContent='Start camera';flipBtn.disabled=true}
+cameraBtn.addEventListener('click',()=>stream?stopCamera():startCamera());
+flipBtn.addEventListener('click',()=>{facing=facing==='environment'?'user':'environment';startCamera()});
+tv.addEventListener('pointerdown',e=>{if(e.target.closest('.tv-label')){}const r=tv.getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};tv.setPointerCapture(e.pointerId);tv.style.cursor='grabbing';e.preventDefault()});
+tv.addEventListener('pointermove',e=>{if(!drag)return;const r=stage.getBoundingClientRect();let x=e.clientX-r.left-drag.x,y=e.clientY-r.top-drag.y;x=Math.max(0,Math.min(r.width-tv.offsetWidth,x));y=Math.max(0,Math.min(r.height-tv.offsetHeight,y));tv.style.left=x+'px';tv.style.top=y+'px';tv.style.transform='none'});
+function endDrag(){drag=null;tv.style.cursor='grab'}tv.addEventListener('pointerup',endDrag);tv.addEventListener('pointercancel',endDrag);
+new ResizeObserver(updateSize).observe(stage);
+window.addEventListener('beforeunload',stopCamera);
+updateSize();
 })();
 </script>
-</body>
-</html>
+</body></html>
