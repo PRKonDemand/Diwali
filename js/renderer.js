@@ -124,14 +124,15 @@
   const live=new Set();
   state.objects.forEach(o=>{live.add(o.id);let item=objects.get(o.id);if(!item){item=makeObject(o);objects.set(o.id,item)}item.group.position.x+=(laneX(o.lane)-item.group.position.x)*.24;item.group.position.z=o.z;if(item.coin){item.coin.rotation.y=t*3+o.spin;item.coin.position.y=1.35+Math.sin(t*4+o.z)*.12}if(item.magnet){item.magnet.rotation.y=t*2.5;item.magnet.position.y=1.35+Math.sin(t*5+o.z)*.15}});
   for(const [id,item] of objects){if(!live.has(id)){scene.remove(item.group);item.group.traverse(n=>{if(n.geometry)n.geometry.dispose()});objects.delete(id)}}
-  const laneTarget=laneX(state.lanePosition);player.position.x+=(laneTarget-player.position.x)*.22;player.position.y=state.jumpY;
+  const laneTarget=laneX(state.lanePosition);player.position.x+=(laneTarget-player.position.x)*.22;player.position.y=state.jumpY;player.position.z=state.playerZ??4;
   player.rotation.z+=(state.lanePosition-(Math.round(state.lanePosition)))*-.06;
   const running=state.running&&!state.paused&&!state.over;
-  if(running){const gait=t*13;playerParts['body'].position.y=.025*Math.sin(gait*2);playerParts['body'].rotation.z=.018*Math.sin(gait);playerParts['leg1'].rotation.x=Math.sin(gait)*.48;playerParts['leg-1'].rotation.x=Math.sin(gait+Math.PI)*.48;playerParts['arm1'].rotation.x=Math.sin(gait+Math.PI)*.42;playerParts['arm-1'].rotation.x=Math.sin(gait)*.42;playerParts['foot1'].rotation.x=playerParts['leg1'].rotation.x*.3;playerParts['foot-1'].rotation.x=playerParts['leg-1'].rotation.x*.3}else{playerParts['body'].position.y=0;}
+  if(state.falling){playerParts.body.rotation.x+=(.42-playerParts.body.rotation.x)*.12;playerParts.body.rotation.z+=(.12-playerParts.body.rotation.z)*.12;player.rotation.x+=(.18-player.rotation.x)*.12;playerParts['arm1'].rotation.x=-.85;playerParts['arm-1'].rotation.x=-.85;playerParts['leg1'].rotation.x=.45;playerParts['leg-1'].rotation.x=.25;}else{player.rotation.x+=(0-player.rotation.x)*.18;playerParts.body.rotation.x+=(0-playerParts.body.rotation.x)*.18;}
+  if(running&&!state.falling){const gait=t*13;playerParts['body'].position.y=.025*Math.sin(gait*2);playerParts['body'].rotation.z=.018*Math.sin(gait);playerParts['leg1'].rotation.x=Math.sin(gait)*.48;playerParts['leg-1'].rotation.x=Math.sin(gait+Math.PI)*.48;playerParts['arm1'].rotation.x=Math.sin(gait+Math.PI)*.42;playerParts['arm-1'].rotation.x=Math.sin(gait)*.42;playerParts['foot1'].rotation.x=playerParts['leg1'].rotation.x*.3;playerParts['foot-1'].rotation.x=playerParts['leg-1'].rotation.x*.3}else{playerParts['body'].position.y=0;}
   if(state.sliding){player.scale.y+=(.48-player.scale.y)*.25;player.position.y=0}else player.scale.y+=(1-player.scale.y)*.2;
   track.forEach((tie,i)=>{tie.position.z= -((i*3.5+t*state.speed*1.5)%145)-2});
   if(ship){ship.position.z=-26+Math.sin(t*.18)*1.3;ship.position.y=-.05+Math.sin(t*1.1)*.08;ship.rotation.y=-.13+Math.sin(t*.22)*.025}
-  camera.position.x+=(player.position.x*.18-camera.position.x)*.035;camera.position.y+=(6.8+state.jumpY*.07-camera.position.y)*.045;camera.lookAt(player.position.x*.12,1.25,-13);
+  camera.position.x+=(player.position.x*.18-camera.position.x)*.035;camera.position.y+=(6.8+state.jumpY*.07-camera.position.y)*.045;camera.lookAt(player.position.x*.12,1.25,player.position.z-17);
   renderer.render(scene,camera);
  }
  async function load(){try{THREE=await import('https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js');init()}catch(e){console.error('3D engine could not load',e);container().innerHTML='<div class="engine-error">3D graphics could not load. Check your internet connection and reload.</div>'}}
