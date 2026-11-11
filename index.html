@@ -1,48 +1,25 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#071b2d">
-<meta name="description" content="Coastal Rush — an endless railway runner across the ocean.">
-<title>Coastal Rush — Endless Runner</title>
-<link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-<main class="game-shell">
-  <canvas id="game" aria-label="Endless runner game. Swipe or use arrow keys to move, jump and slide."></canvas>
-  <header class="hud">
-    <div class="brand"><span class="brand-mark">CR</span><span>COASTAL <b>RUSH</b></span></div>
-    <div class="stats"><div><small>DISTANCE</small><strong id="distance">0 m</strong></div><div><small>COINS</small><strong id="coins">0</strong></div></div>
-    <button id="sound" class="icon-button" aria-label="Toggle sound">♫</button>
-  </header>
-  <div class="mission"><span class="live-dot"></span> OCEAN LINE <span class="mission-divider">/</span> EXPRESS 07</div>
-  <section class="start-screen" id="startScreen">
-    <div class="eyebrow">THE COAST IS YOURS</div>
-    <h1>Run beyond<br><em>the horizon.</em></h1>
-    <p>Dodge freight trains, leap over barriers and race beside a giant cargo ship.</p>
-    <button id="play" class="primary-button">START RUN <span>→</span></button>
-    <div class="controls-note">← → MOVE <i>•</i> ↑ JUMP <i>•</i> ↓ SLIDE</div>
-  </section>
-  <section class="pause-screen hidden" id="pauseScreen">
-    <div class="eyebrow">TAKE A BREATHER</div><h2>PAUSED</h2>
-    <button id="resume" class="primary-button">RESUME RUN <span>→</span></button>
-  </section>
-  <section class="game-over hidden" id="gameOver">
-    <div class="eyebrow">END OF THE LINE</div><h2>RUN COMPLETE</h2>
-    <div class="final-score"><small>YOUR DISTANCE</small><strong id="finalDistance">0 m</strong></div>
-    <div class="final-score"><small>COINS COLLECTED</small><strong id="finalCoins">0</strong></div>
-    <button id="restart" class="primary-button">RUN AGAIN <span>↻</span></button>
-  </section>
-  <div class="game-actions hidden" id="gameActions">
-    <button id="pause" class="icon-button" aria-label="Pause game">Ⅱ</button>
-  </div>
-  <div class="touch-hint" id="touchHint">SWIPE TO MOVE <span>↑ JUMP</span></div>
-  <footer class="footer"><span>PRK GAMES</span><span>COASTAL RAILWAY • 2026</span></footer>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071b2d"><meta name="description" content="Coastal Rush — a 3D endless railway runner across the ocean.">
+<title>Coastal Rush — 3D Endless Runner</title><link rel="stylesheet" href="css/style.css">
+</head><body><main class="game-shell">
+<div id="game" role="img" aria-label="3D endless runner. Swipe left or right to change lanes, up to jump, down to slide."></div>
+<header class="hud"><div class="brand"><span class="brand-mark">CR</span><span>COASTAL <b>RUSH</b></span></div>
+<div class="stats"><div><small>DISTANCE</small><strong id="distance">0 m</strong></div><div><small>COINS</small><strong id="coins">0</strong></div></div>
+<button id="sound" class="icon-button" aria-label="Toggle sound" aria-pressed="true">♫</button></header>
+<div class="mission"><span class="live-dot"></span> OCEAN LINE <span class="mission-divider">/</span> EXPRESS 07</div>
+<section class="start-screen" id="startScreen"><div class="eyebrow">THE COAST IS YOURS</div><h1>Run beyond<br><em>the horizon.</em></h1>
+<p>Dodge freight trains, leap over barriers and race beside a giant cargo ship.</p>
+<button id="play" class="primary-button">START RUN <span>→</span></button>
+<div class="controls-note">← → MOVE <i>•</i> ↑ JUMP <i>•</i> ↓ SLIDE</div></section>
+<section class="pause-screen hidden" id="pauseScreen"><div class="eyebrow">TAKE A BREATHER</div><h2>PAUSED</h2><button id="resume" class="primary-button">RESUME RUN <span>→</span></button></section>
+<section class="game-over hidden" id="gameOver"><div class="eyebrow">END OF THE LINE</div><h2>RUN COMPLETE</h2>
+<div class="final-score"><small>YOUR DISTANCE</small><strong id="finalDistance">0 m</strong></div><div class="final-score"><small>COINS COLLECTED</small><strong id="finalCoins">0</strong></div>
+<button id="restart" class="primary-button">RUN AGAIN <span>↻</span></button></section>
+<div class="game-actions hidden" id="gameActions"><button id="pause" class="icon-button" aria-label="Pause game">Ⅱ</button></div>
+<div class="touch-hint" id="touchHint">SWIPE TO MOVE <span>↑ JUMP</span></div>
+<footer class="footer"><span>PRK GAMES</span><span>COASTAL RAILWAY • 2026</span></footer>
 </main>
-<script src="js/renderer.js"></script>
-<script src="js/input.js"></script>
-<script src="js/game.js"></script>
-<script src="js/main.js"></script>
-</body>
-</html>
+<script src="js/sound.js"></script><script src="js/input.js"></script><script src="js/game.js"></script><script src="js/main.js"></script><script src="js/renderer.js"></script>
+</body></html>
