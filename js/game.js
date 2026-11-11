@@ -58,6 +58,7 @@
   }
   state.objects=state.objects.filter(o=>o.z<9.5&&!o.hit);
   for(const o of state.objects){
+   if(state.falling)break;
    if(o.hit||o.z<2.6||o.z>4.9||Math.abs(o.lane-state.lanePosition)>.36)continue;
    if(o.type==='coin'){collectCoin(o);continue}
    if(o.type==='magnet'){o.hit=true;state.magnetTimer=15;window.GameUI?.magnet(15);window.GameSound?.powerup();continue}
