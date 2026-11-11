@@ -8,7 +8,7 @@
  function buildPlayer(){
   // Detailed runner model adapted from the supplied 3D character review.
   // Keep the skateboard attached to the player so it follows jumps and lane changes.
-  player=group(scene);player.position.set(0,0,4);
+  player=group(scene);player.position.set(0,0,4);player.rotation.y=Math.PI;
   const body=group(player);playerParts.body=body;
   const material=(color,roughness=.62,metalness=0)=>mat(color,roughness,metalness);
   const skin=material(0xc9875d),skinLight=material(0xe2a477),hoodie=material(0x13a8a0),hoodieDark=material(0x08736f),
