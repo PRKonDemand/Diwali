@@ -64,7 +64,7 @@
   const laneTarget=laneX(state.lanePosition);player.position.x+=(laneTarget-player.position.x)*.22;player.position.y=state.jumpY;
   player.rotation.z+=(state.lanePosition-(Math.round(state.lanePosition)))*-.06;
   const running=state.running&&!state.paused&&!state.over;
-  if(running){const gait=t*13;playerParts.leg1.rotation.x=Math.sin(gait)*.72;playerParts.leg-1.rotation.x=Math.sin(gait+Math.PI)*.72;playerParts.arm1.rotation.x=Math.sin(gait+Math.PI)*.62;playerParts.arm-1.rotation.x=Math.sin(gait)*.62;playerParts.foot1.rotation.x=playerParts.leg1.rotation.x*.35;playerParts.foot-1.rotation.x=playerParts.leg-1.rotation.x*.35}
+  if(running){const gait=t*13;playerParts['leg1'].rotation.x=Math.sin(gait)*.72;playerParts['leg-1'].rotation.x=Math.sin(gait+Math.PI)*.72;playerParts['arm1'].rotation.x=Math.sin(gait+Math.PI)*.62;playerParts['arm-1'].rotation.x=Math.sin(gait)*.62;playerParts['foot1'].rotation.x=playerParts['leg1'].rotation.x*.35;playerParts['foot-1'].rotation.x=playerParts['leg-1'].rotation.x*.35}
   if(state.sliding){player.scale.y+=(.48-player.scale.y)*.25;player.position.y=0}else player.scale.y+=(1-player.scale.y)*.2;
   track.forEach((tie,i)=>{tie.position.z= -((i*3.5+t*state.speed*1.5)%145)-2});
   if(ship){ship.position.z=-26+Math.sin(t*.18)*1.3;ship.position.y=-.05+Math.sin(t*1.1)*.08;ship.rotation.y=-.13+Math.sin(t*.22)*.025}
